@@ -1,4 +1,4 @@
-# hakai-dataset-repository-template
+# Motile Invertebrates: Biodiversity
 
 <div float="left">
 <img src=docs/logos/tula-logo.png />

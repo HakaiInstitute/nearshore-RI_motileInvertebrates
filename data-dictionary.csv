@@ -1,1 +1,16 @@
-variable,long_name,units,standard_name,comment
+table,variable,category,units,description
+motile_invertebrate-surveys.csv,date,date,yyyy-mm-dd,Date on which the survey was conducted
+motile_invertebrate-surveys.csv,site_name,character,NA,Rocky intertidal site where survey was conducted
+motile_invertebrate-surveys.csv,observer,character,NA,The individual(s) who conducted the survey
+motile_invertebrate-surveys.csv,plot_type,character,NA,"Type of ecological substrate within each plot area. Defined by organism/group forming the majority of the substrate (Fucus, barnacles, or mussels) "
+motile_invertebrate-surveys.csv,plot,numeric,NA,Permanent plot areas (marked by bolts) defining five plots for each substrate at each site. Each plot area measures 75cm x 50 cm
+motile_invertebrate-surveys.csv,subplot_size,numeric,cm,The dimensions of the plot area within which mobile invertebrates are being measured/counted
+motile_invertebrate-surveys.csv,subplot_location,character,NA,The location of a subplot within the overall plot area
+motile_invertebrate-surveys.csv,scientific_name,character,NA,Taxonomic name for a given taxon code
+motile_invertebrate-surveys.csv,description,character,NA,"Common vernacular description of what a given code represents (i.e. acorn barnacle, dead acorn barnacle)"
+motile_invertebrate-surveys.csv,count_type,character,NA,"Component of the survey for a given observation (Measured individuals, Non-measured individuals, Littorine counts, Large limpet counts, Small limpet counts, Medium limpet counts)"
+motile_invertebrate-surveys.csv,count,numeric,NA,"The number of individuals of a given taxon and size (when measured) within the subplot area, or the total number of individuals within the subplot area if size not measured."
+motile_invertebrate-surveys.csv,size,numeric,mm,Size to the nearest mm of measured individuals. - measured in the field using calipers
+motile_invertebrate-surveys.csv,entered_by,character,NA,The individual(s) who entered the data
+motile_invertebrate-surveys.csv,checked_by,character,NA,The individual(s) who quality controlled the data
+motile_invertebrate-surveys.csv,notes,character,NA,Records anything of note about a given observation

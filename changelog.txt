@@ -1,25 +1,56 @@
 # Changelog
-
 All notable changes to this project will be documented in this file.
 
-## [0.0.1] - yyyy-mm-dd
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
+and this project adheres to [Semantic Versioning]
+(https://semver.org/spec/v2.0.0.html).
 
-Summary
+## Unreleased
 
-### Added
-
-*
-* 
-*
-
-### Fixed
-
-* 
-
+## [3.1.0] 2024-01-10
 ### Changed
+- Updated survey data to November 2023
+- Updated README file
 
-*
+## [3.0.0] 2023-02-03
+### Changed
+- Removed "taxon_code" column from survey data and replaced with 
+"scientific_name" and "description" columns. 
+- Updated survey data to November 2022
+- Updated DataDictionary to reflect above changes
+- Updated README file
 
 ### Removed
+- Removed Rocky Intertidal taxa codes
 
-*
+## [2.0.0] 2022-01-11
+### Changed
+- Updated survey spreadsheet with survey data up to November 2021
+
+## [1.0.1] 2021-02-13
+### Changed
+- Updated survey spreadsheet with QC data fixes
+
+## [1.0.0] 2020-03-04
+### Added
+- Creative Commons license
+- Overall Rocky Intertidal protocol
+
+### Changed
+- Updated README
+- Updated survey spreadsheet with 2019 survey data
+- Updated Data Dictionary
+- Updated taxa spreadsheet with new codes and structure
+
+### Removed
+- Rocky Intertidal site data
+- Fucus Bed Dynamics protocol
+
+## [0.1.0] - 2019-01-25
+### Added
+- README
+- Mobile Invertebrate survey data (2016 - Nov 2018)
+- Rocky Intertidal taxa codes
+- Rocky Intertidal site data
+- Data Dictionary with definitions of all variables
+- Mobile Invertebrate protocol
