@@ -40,8 +40,8 @@ mi.e.int$eventRemarks <- 'expedition'
 
 # Reorder columns
 mi.e.int <- mi.e.int %>% 
-  select(datasetName, eventID, parentEventID, eventDate, sampleSizeUnit,
-         sampleSizeValue, eventRemarks)
+  select(datasetName, eventID, parentEventID, eventDate, sampleSizeValue,
+         sampleSizeUnit, eventRemarks)
 
 # Event table for site visits--------------------------------------------------
 mi.e.sv <- rii # Copy interval data
@@ -75,7 +75,7 @@ mi.e.sv$eventRemarks <- 'station visit'
 
 # Select relevant columns
 mi.e.sv <- mi.e.sv %>% 
-  select(datasetName, eventID, interval, date, sampleSizeUnit, sampleSizeValue,
+  select(datasetName, eventID, interval, date, sampleSizeValue, sampleSizeUnit,
          eventRemarks)
 
 names(mi.e.sv) <- c('datasetName', 'eventID', 'parentEventID', 'eventDate',
@@ -116,50 +116,115 @@ mi.e.quad$eventRemarks <- 'quadrat'
 
 # Rename columns
 names(mi.e.quad) <- c('datasetName', 'eventID', 'parentEventID', 'eventDate',
-                      'sampleSizeUnit', 'sampleSizeValue', 'eventRemarks')
+                      'sampleSizeValue', 'sampleSizeUnit', 'eventRemarks')
 
 # Event table for subplots-----------------------------------------------------
-# Copy survey data and find distinct subplots
-mi.e.sp <- mi %>% 
-  drop_na(subplot_location) %>% 
-  distinct(date, site_name, plot_type, plot, subplot_location)
+# Copy survey data
+mi.e.sl <- mi
 
-# Build subplot code column
-mi.e.sp$sp_code <- NA_character_
+# Add plot type code column
+mi.e.sl$type.code <- substring(mi.e.sl$plot_type, 1, 1)
 
-for (i in 1:length(mi.e.sp$date)){
-  if (mi.e.sp$subplot_location[i] == 'top left (1)'){
-    mi.e.sp$sp_code[i] <- 'S1'
-  } else {
-    if (mi.e.sp$subplot_location[i] == 'middle (2)'){
-      mi.e.sp$sp_code[i] <- 'S2'
+# Add abbreviated site names column
+mi.e.sl$site_code <- NA_character_
+
+for (i in 1:length(mi.e.sl$interval)){
+  if (mi.e.sl$site_name[i] == 'North Beach'){
+    mi.e.sl$site_code[i] <- 'NB'
+  } else{
+    if (mi.e.sl$site_name[i] == 'West Beach'){
+      mi.e.sl$site_code[i] <- 'NB'
     } else{
-      mi.e.sp$sp_code[i] <- 'S3'
+      mi.e.sl$site_code[i] <- 'FB'
     }
   }
 }
 
-# Rename columns
-names(mi.e.sp) <- c('eventDate', 'site_name', 'plot_type', 'plot', 
-                    'subplot_location', 'sp_code')
+# Build quadrat code column
+mi.e.sl$quad.code <- paste(mi.e.sl$interval, mi.e.sl$site_code,
+                           mi.e.sl$date, sep = '_')
+mi.e.sl$quad.code <- paste(mi.e.sl$quad.code, '_', mi.e.sl$type.code, 'Q', 
+                           mi.e.sl$plot, sep = '')
 
-# Join with site visit data
-mi.e.sp <- left_join(mi.e.sp, mi.e.quad)
+# Build subplot code column
+mi.e.sl$sp_code <- NA_character_
+
+for (i in 1:length(mi.e.sl$date)){
+  if (is.na(mi.e.sl$subplot_location[i])){
+    mi.e.sl$sp_code[i] <- NA
+  } else {
+    if (mi.e.sl$subplot_location[i] == 'top left (1)'){
+      mi.e.sl$sp_code[i] <- 'S1'
+    } else {
+      if (mi.e.sl$subplot_location[i] == 'middle (2)'){
+        mi.e.sl$sp_code[i] <- 'S2'
+      } else{
+        mi.e.sl$sp_code[i] <- 'S3'
+      }
+    }
+  }
+}
+
+mi.e.sl$sp_code <- paste(mi.e.sl$quad.code, mi.e.sl$sp_code, sep = '_')
+
+# Find distinct subplots
+mi.e.sl <- mi.e.sl %>% 
+  drop_na(subplot_location) %>%
+  subset(count_type == 'Small limpets (<5mm)' 
+         | count_type == 'Medium limpets (5-15mm)'
+         | count_type == 'Littorines') %>% 
+  distinct(subplot_size, quad.code, sp_code, count_type)
+
+# Make simplified count type code
+mi.e.sl$count_code <- NA_character_
+
+for (i in 1:length(mi.e.sl$quad.code)){
+  if (is.na(mi.e.sl$count_type[i])){
+    mi.e.sl$count_code[i] <- NA
+  } else {
+    if (mi.e.sl$count_type[i] == 'Small limpets (<5mm)'){
+      mi.e.sl$count_code[i] <- 'SL'
+    } else {
+      if (mi.e.sl$count_type[i] == 'Medium limpets (5-15mm)'){
+        mi.e.sl$count_code[i] <- 'ML'
+      } else{
+        mi.e.sl$count_code[i] <- 'L'
+      }
+    }
+  }
+}
+
+mi.e.sl$sp_code <- paste(mi.e.sl$sp_code, mi.e.sl$count_code, sep = '')
 
 # Select relevant columns
-mi.e.sp <- mi.e.sp %>% 
-  select(datasetName, sp_code, eventID)
+mi.e.sl <- mi.e.sl %>% 
+  select(quad.code, sp_code, subplot_size)
 
-# Build the quad event column
-mi.e.quad$quad.code <- paste(mi.e.quad$eventID, mi.e.quad$quad.code, sep = '_')
+# Calculate subplot size
+mi.e.sl$sampleSizeValue <- NA_real_
 
-
-# Add missing columns
-mi.e.quad$eventDate <- NA_Date_
-mi.e.quad$sampleSizeValue <- 0.38
-mi.e.quad$sampleSizeUnit <- 'square meter'
-mi.e.quad$eventRemarks <- 'quadrat'
+for (i in 1:length(mi.e.sl$quad.code)){
+  if (mi.e.sl$subplot_size[i] == '10cm x 10cm'){
+    mi.e.sl$sampleSizeValue[i] <- 0.01
+  } else {
+    mi.e.sl$sampleSizeValue[i] <- 0.04
+  }
+}
 
 # Rename columns
-names(mi.e.quad) <- c('datasetName', 'eventID', 'parentEventID', 'eventDate',
-                      'sampleSizeUnit', 'sampleSizeValue', 'eventRemarks')
+names(mi.e.sl) <- c('parentEventID', 'eventID', 'subplot_size',
+                    'sampleSizeValue')
+
+# Add missing columns
+mi.e.sl$eventDate <- NA_Date_
+mi.e.sl$datasetName <- 'Hakai Institute Rocky Intertidal Invertebrates'
+mi.e.sl$sampleSizeUnit <- 'square meter'
+mi.e.sl$eventRemarks <- 'sub quadrat'
+
+# Select relevant columns
+mi.e.sl <- mi.e.sl %>% 
+  select(datasetName, eventID, parentEventID, eventDate, sampleSizeValue,
+         sampleSizeUnit, eventRemarks)
+
+# Join events together into single dataset
+event <- rbind(mi.e.int, mi.e.sv, mi.e.quad, mi.e.sl)
