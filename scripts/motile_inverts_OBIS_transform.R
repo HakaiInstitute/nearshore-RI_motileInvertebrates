@@ -7,12 +7,13 @@
 #' Project: Nearshore
 #' Survey: Rocky Intertidal
 #' Date Created: 2024-04-01
-#' Last Updated:
+#' Last Updated: 2024-04-10
 #' ============================================================================
 #================== Preamble ==================================================
 # Load required libraries
 library(tidyverse)
 library(googlesheets4)
+library(rairtable)
 
 # Load most up to date QCd data
 mi <- read_csv('./data/motile_invertebrates-surveys.csv')
@@ -24,6 +25,9 @@ rii <- read_sheet(ss = '1Jlbt_-rvoGA6V6EQtIdmaxYnlaru0fZMS52EcN5pIGE',
 
 # Join intervals to survey data
 mi <- left_join(mi, rii)
+
+# Source taxonomic data
+source('./scripts/source_taxonomy.R')
 
 #================== Event Core ================================================
 # Event table for expeditions--------------------------------------------------
@@ -133,7 +137,7 @@ for (i in 1:length(mi.e.sl$interval)){
     mi.e.sl$site_code[i] <- 'NB'
   } else{
     if (mi.e.sl$site_name[i] == 'West Beach'){
-      mi.e.sl$site_code[i] <- 'NB'
+      mi.e.sl$site_code[i] <- 'WB'
     } else{
       mi.e.sl$site_code[i] <- 'FB'
     }
@@ -228,3 +232,45 @@ mi.e.sl <- mi.e.sl %>%
 
 # Join events together into single dataset
 event <- rbind(mi.e.int, mi.e.sv, mi.e.quad, mi.e.sl)
+
+# Remove unneeded elements
+rm(list = c('mi.e.int', 'mi.e.quad', 'mi.e.sl', 'mi.e.sv', 'i'))
+
+#================== Occurrence Extension ======================================
+# Copy survey data
+occurrence <- mi
+
+# Join with taxonomic data
+occurrence <- left_join(occurrence, ns.taxa.full)
+
+# Whole plot occurrences-------------------------------------------------------
+occurrence.wp <- occurrence %>%         # split off whole plot observations
+  subset(subplot_size == 'whole plot' | subplot_size == '75cm x 50cm') %>% 
+  group_by(date, site_name, plot_type, plot, rank, scientific_name) %>% 
+  summarise(total_count = sum(count)) %>% 
+  ungroup()
+
+# Join with interval data
+occurrence.wp <- left_join(occurrence.wp, rii)
+
+# Add abbreviated site names column
+occurrence.wp$site_code <- NA_character_
+
+for (i in 1:length(occurrence.wp$interval)){
+  if (occurrence.wp$site_name[i] == 'North Beach'){
+    occurrence.wp$site_code[i] <- 'NB'
+  } else{
+    if (occurrence.wp$site_name[i] == 'West Beach'){
+      occurrence.wp$site_code[i] <- 'WB'
+    } else{
+      occurrence.wp$site_code[i] <- 'FB'
+    }
+  }
+}
+
+# Add plot type code column
+occurrence.wp$type.code <- substring(occurrence.wp$plot_type, 1, 1)
+
+# Build quadrat code column
+occurrence.wp$quad.code <- paste(occurrence.wp$type.code, 'Q', 
+                                 occurrence.wp$plot, sep = '')
