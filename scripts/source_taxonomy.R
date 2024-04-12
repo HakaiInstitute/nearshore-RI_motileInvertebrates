@@ -11,7 +11,7 @@
 table <- airtable('Taxa', 'appoo8TNz4FSn4260')
 
 ns.taxa <- read_airtable(table, id_to_col = TRUE, max_rows = 50000) %>%
-  select(airtable_record_id, scientific_name, common_name, rank, kingdom, 
+  select(airtable_record_id, LSID, scientific_name, common_name, rank, kingdom, 
          subkingdom, infrakingdom, phylum, subphylum, infraphylum, superclass, 
          class, subclass, infraclass, subterclass, superorder, order, suborder, 
          infraorder, section, subsection, superfamily, family, subfamily, genus, 
@@ -117,7 +117,7 @@ ri.codes <- ns.codes %>%
   select(taxon_code, rank, scientific_name, description)
 
 ns.taxa.full <- ns.taxa %>% 
-  select(taxonID, scientific_name, common_name, rank)
+  select(taxonID, LSID, scientific_name, common_name, rank)
 
 ns.taxa.full$kingdom <- NA_character_
 ns.taxa.full$subkingdom <- NA_character_

@@ -7,7 +7,7 @@
 #' Project: Nearshore
 #' Survey: Rocky Intertidal
 #' Date Created: 2024-04-01
-#' Last Updated: 2024-04-10
+#' Last Updated: 2024-04-11
 #' ============================================================================
 #================== Preamble ==================================================
 # Load required libraries
@@ -58,7 +58,7 @@ for (i in 1:length(mi.e.sv$interval)){
     mi.e.sv$site_code[i] <- 'NB'
   } else{
     if (mi.e.sv$site_name[i] == 'West Beach'){
-      mi.e.sv$site_code[i] <- 'NB'
+      mi.e.sv$site_code[i] <- 'WB'
     } else{
       mi.e.sv$site_code[i] <- 'FB'
     }
@@ -246,7 +246,7 @@ occurrence <- left_join(occurrence, ns.taxa.full)
 # Whole plot occurrences-------------------------------------------------------
 occurrence.wp <- occurrence %>%         # split off whole plot observations
   subset(subplot_size == 'whole plot' | subplot_size == '75cm x 50cm') %>% 
-  group_by(date, site_name, plot_type, plot, rank, scientific_name) %>% 
+  group_by(date, site_name, plot_type, plot, rank, scientific_name, LSID,) %>% 
   summarise(total_count = sum(count)) %>% 
   ungroup()
 
@@ -274,3 +274,48 @@ occurrence.wp$type.code <- substring(occurrence.wp$plot_type, 1, 1)
 # Build quadrat code column
 occurrence.wp$quad.code <- paste(occurrence.wp$type.code, 'Q', 
                                  occurrence.wp$plot, sep = '')
+
+# Build event ID column to match with event table
+occurrence.wp$eventID <- paste(occurrence.wp$interval, 
+                               occurrence.wp$site_code,
+                               occurrence.wp$date,
+                               occurrence.wp$quad.code,
+                               sep = '_')
+
+# Join with event table
+occurrence.wp <- left_join(occurrence.wp, event)
+
+# Add occurrence ID column
+occurrence.wp$observation <- 1:nrow(occurrence.wp) 
+occurrence.wp$occurrenceID <- paste('wholePlot', occurrence.wp$observation,
+                                    sep = '-')
+
+# Add other missing columns
+occurrence.wp$organismQuantityType <- 'individuals'
+
+occurrence.wp$decimalLatitude <- NA_real_
+occurrence.wp$decimalLongitude <- NA_real_
+
+for (i in 1:length(occurrence.wp$interval)){
+  if (occurrence.wp$site_name[i] == 'North Beach'){
+    occurrence.wp$decimalLatitude[i] <- 51.665080
+    occurrence.wp$decimalLongitude[i] <- -128.134700
+  } else{
+    if (occurrence.wp$site_name[i] == 'West Beach'){
+      occurrence.wp$decimalLatitude[i] <- 51.657423
+      occurrence.wp$decimalLongitude[i] <- -128.148814
+    } else{
+      occurrence.wp$decimalLatitude[i] <- 51.640680
+      occurrence.wp$decimalLongitude[i] <- -128.156779
+    }
+  }
+}
+
+occurrence.wp$basisOfRecord <- 'HumanObservation'
+occurrence.wp$occurrenceStatus <- 'present'
+
+# Select relevant columns
+occurrence.wp <- occurrence.wp %>% 
+  select(eventID, occurrenceID, scientific_name, total_count, 
+         organismQuantityType, date, decimalLatitude, decimalLongitude,
+         rank, LSID, basisOfRecord, occurrenceStatus)
