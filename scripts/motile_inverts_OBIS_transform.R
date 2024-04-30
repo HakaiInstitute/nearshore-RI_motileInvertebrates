@@ -187,12 +187,12 @@ for (i in 1:length(mi.e.sl$quad.code)){
     mi.e.sl$count_code[i] <- NA
   } else {
     if (mi.e.sl$count_type[i] == 'Small limpets (<5mm)'){
-      mi.e.sl$count_code[i] <- 'SL'
+      mi.e.sl$count_code[i] <- 'LIMP'
     } else {
       if (mi.e.sl$count_type[i] == 'Medium limpets (5-15mm)'){
-        mi.e.sl$count_code[i] <- 'ML'
+        mi.e.sl$count_code[i] <- 'LIMP'
       } else{
-        mi.e.sl$count_code[i] <- 'L'
+        mi.e.sl$count_code[i] <- 'LITT'
       }
     }
   }
@@ -232,6 +232,9 @@ mi.e.sl <- mi.e.sl %>%
 
 # Join events together into single dataset
 event <- rbind(mi.e.int, mi.e.sv, mi.e.quad, mi.e.sl)
+
+# Remove duplicated rows
+event <- unique(event)
 
 # Remove unneeded elements
 rm(list = c('mi.e.int', 'mi.e.quad', 'mi.e.sl', 'mi.e.sv', 'i'))
@@ -319,3 +322,10 @@ occurrence.wp <- occurrence.wp %>%
   select(eventID, occurrenceID, scientific_name, total_count, 
          organismQuantityType, date, decimalLatitude, decimalLongitude,
          rank, LSID, basisOfRecord, occurrenceStatus)
+
+# Rename columns
+names(occurrence.wp) <- c('eventID', 'occurrenceID', 'scientificName',
+                          'organismQuantity', 'organismQuantityType',
+                          'eventDate', 'decimalLatitude', 'decimalLongitude',
+                          'taxonRank', 'scientificNameID', 'basisOfRecord',
+                          'occurrenceStatus')
