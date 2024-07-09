@@ -27,7 +27,7 @@ rii <- read_sheet(ss = '1Jlbt_-rvoGA6V6EQtIdmaxYnlaru0fZMS52EcN5pIGE',
 mi <- left_join(mi, rii)
 
 # Source taxonomic data
-source('./scripts/source_taxonomy.R')
+source('./obis/source_taxonomy.R')
 
 #================== Event Core ================================================
 # Event table for expeditions--------------------------------------------------

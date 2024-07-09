@@ -17,9 +17,9 @@ and/or collaborate with Hakai Nearshore researchers if you are considering
 using this dataset for manuscripts or other forms of reporting.
 
 ```
-Froese, T., Gehman, A., Hessing-Lewis, M., and Sadlier-Brown, G. (2023). 
-Rocky intertidal motile invertebrate survey data from BC Central Coast 2016-2023. 
-Hakai Institute dataset V3.1.0. [access date]
+Froese, T., Sadlier-Brown, G., Hessing-Lewis, M., Gehman, A. (2023). 
+Motile Invertebrate Surveys - BC Central Coast (v3.0) [Data set]. 
+Hakai Institute. https://doi.org/10.21966/0052-wk15
 ```
 
 ## Summary
@@ -51,7 +51,7 @@ See the data dictionary file for a complete description of data variables,
 units and descriptions.
 
 - ***Data*** 
-	- motile_inverts-surveys.csv:** Counts of mobile invertebrate species 
+	- **motile_inverts-surveys.csv:** Counts of mobile invertebrate species 
 	quantified within a set area (subplot_size), with size measurements for select 
 	species. Associated with fucus, mussel or barnacle primary habitat (plot_type). 
 	Individual plots are repeated across time.
@@ -59,6 +59,16 @@ units and descriptions.
 - ***Protocols:***
 	- **rocky_intertidal-protocol.pdf:** Detailed description of field survey 
 	methods and equipment. 	
+
+## OBIS Translation
+
+The "obis" folder within the repository contains files related to translating a 
+subset of the raw survey data into a format that can be shared with the 
+**O**cean **B**iodiversity **I**nformation **S**ystem (https://obis.org/), and 
+should be disregarded for other uses.  The same can be said for the 
+**nearshore-RI_motileInvertebrates.Rproj** and **.Renviron** files in the main 
+repository. None of these files contain different data from the basic survey 
+data found in the "data" folder.
 
 ---
 Contact Tyrel Froese or Alyssa Gehman at nearshore@hakai.org if you have any 
