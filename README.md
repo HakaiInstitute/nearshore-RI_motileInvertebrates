@@ -18,8 +18,8 @@ using this dataset for manuscripts or other forms of reporting.
 
 ```
 Froese, T., Sadlier-Brown, G., Hessing-Lewis, M., Gehman, A. (2023). 
-Motile Invertebrate Surveys - BC Central Coast (v3.0) [Data set]. 
-Hakai Institute. https://doi.org/10.21966/0052-wk15
+Motile Invertebrate Surveys - BC Central Coast (v3.1.0) 
+[Data set]. https://doi.org/10.21966/0052-wk15
 ```
 
 ## Summary
