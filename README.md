@@ -66,9 +66,9 @@ The "obis" folder within the repository contains files related to translating a
 subset of the raw survey data into a format that can be shared with the 
 **O**cean **B**iodiversity **I**nformation **S**ystem (https://obis.org/), and 
 should be disregarded for other uses.  The same can be said for the 
-**nearshore-RI_motileInvertebrates.Rproj** and **.Renviron** files in the main 
-repository. None of these files contain different data from the basic survey 
-data found in the "data" folder.
+**nearshore-RI_motileInvertebrates.Rproj** file in the main repository. None of
+these files contain different data from the basic survey data found in the 
+"data" folder.
 
 ---
 Contact Tyrel Froese or Alyssa Gehman at nearshore@hakai.org if you have any 
