@@ -122,122 +122,14 @@ mi.e.quad$eventRemarks <- 'quadrat'
 names(mi.e.quad) <- c('datasetName', 'eventID', 'parentEventID', 'eventDate',
                       'sampleSizeValue', 'sampleSizeUnit', 'eventRemarks')
 
-# Event table for subplots-----------------------------------------------------
-# Copy survey data
-mi.e.sl <- mi
-
-# Add plot type code column
-mi.e.sl$type.code <- substring(mi.e.sl$plot_type, 1, 1)
-
-# Add abbreviated site names column
-mi.e.sl$site_code <- NA_character_
-
-for (i in 1:length(mi.e.sl$interval)){
-  if (mi.e.sl$site_name[i] == 'North Beach'){
-    mi.e.sl$site_code[i] <- 'NB'
-  } else{
-    if (mi.e.sl$site_name[i] == 'West Beach'){
-      mi.e.sl$site_code[i] <- 'WB'
-    } else{
-      mi.e.sl$site_code[i] <- 'FB'
-    }
-  }
-}
-
-# Build quadrat code column
-mi.e.sl$quad.code <- paste(mi.e.sl$interval, mi.e.sl$site_code,
-                           mi.e.sl$date, sep = '_')
-mi.e.sl$quad.code <- paste(mi.e.sl$quad.code, '_', mi.e.sl$type.code, 'Q', 
-                           mi.e.sl$plot, sep = '')
-
-# Build subplot code column
-mi.e.sl$sp_code <- NA_character_
-
-for (i in 1:length(mi.e.sl$date)){
-  if (is.na(mi.e.sl$subplot_location[i])){
-    mi.e.sl$sp_code[i] <- NA
-  } else {
-    if (mi.e.sl$subplot_location[i] == 'top left (1)'){
-      mi.e.sl$sp_code[i] <- 'S1'
-    } else {
-      if (mi.e.sl$subplot_location[i] == 'middle (2)'){
-        mi.e.sl$sp_code[i] <- 'S2'
-      } else{
-        mi.e.sl$sp_code[i] <- 'S3'
-      }
-    }
-  }
-}
-
-mi.e.sl$sp_code <- paste(mi.e.sl$quad.code, mi.e.sl$sp_code, sep = '_')
-
-# Find distinct subplots
-mi.e.sl <- mi.e.sl %>% 
-  drop_na(subplot_location) %>%
-  subset(count_type == 'Small limpets (<5mm)' 
-         | count_type == 'Medium limpets (5-15mm)'
-         | count_type == 'Littorines') %>% 
-  distinct(subplot_size, quad.code, sp_code, count_type)
-
-# Make simplified count type code
-mi.e.sl$count_code <- NA_character_
-
-for (i in 1:length(mi.e.sl$quad.code)){
-  if (is.na(mi.e.sl$count_type[i])){
-    mi.e.sl$count_code[i] <- NA
-  } else {
-    if (mi.e.sl$count_type[i] == 'Small limpets (<5mm)'){
-      mi.e.sl$count_code[i] <- 'LIMP'
-    } else {
-      if (mi.e.sl$count_type[i] == 'Medium limpets (5-15mm)'){
-        mi.e.sl$count_code[i] <- 'LIMP'
-      } else{
-        mi.e.sl$count_code[i] <- 'LITT'
-      }
-    }
-  }
-}
-
-mi.e.sl$sp_code <- paste(mi.e.sl$sp_code, mi.e.sl$count_code, sep = '')
-
-# Select relevant columns
-mi.e.sl <- mi.e.sl %>% 
-  select(quad.code, sp_code, subplot_size)
-
-# Calculate subplot size
-mi.e.sl$sampleSizeValue <- NA_real_
-
-for (i in 1:length(mi.e.sl$quad.code)){
-  if (mi.e.sl$subplot_size[i] == '10cm x 10cm'){
-    mi.e.sl$sampleSizeValue[i] <- 0.01
-  } else {
-    mi.e.sl$sampleSizeValue[i] <- 0.04
-  }
-}
-
-# Rename columns
-names(mi.e.sl) <- c('parentEventID', 'eventID', 'subplot_size',
-                    'sampleSizeValue')
-
-# Add missing columns
-mi.e.sl$eventDate <- NA_Date_
-mi.e.sl$datasetName <- 'Hakai Institute Rocky Intertidal Invertebrates'
-mi.e.sl$sampleSizeUnit <- 'square meter'
-mi.e.sl$eventRemarks <- 'sub quadrat'
-
-# Select relevant columns
-mi.e.sl <- mi.e.sl %>% 
-  select(datasetName, eventID, parentEventID, eventDate, sampleSizeValue,
-         sampleSizeUnit, eventRemarks)
-
 # Join events together into single dataset
-event <- rbind(mi.e.int, mi.e.sv, mi.e.quad, mi.e.sl)
+event <- rbind(mi.e.int, mi.e.sv, mi.e.quad)
 
 # Remove duplicated rows
 event <- unique(event)
 
 # Remove unneeded elements
-rm(list = c('mi.e.int', 'mi.e.quad', 'mi.e.sl', 'mi.e.sv', 'i'))
+rm(list = c('mi.e.int', 'mi.e.quad', 'mi.e.sv', 'i'))
 
 #================== Occurrence Extension ======================================
 # Copy survey data
@@ -246,86 +138,163 @@ occurrence <- mi
 # Join with taxonomic data
 occurrence <- left_join(occurrence, ns.taxa.full)
 
-# Whole plot occurrences-------------------------------------------------------
-occurrence.wp <- occurrence %>%         # split off whole plot observations
-  subset(subplot_size == 'whole plot' | subplot_size == '75cm x 50cm') %>% 
-  group_by(date, site_name, plot_type, plot, rank, scientific_name, LSID,) %>% 
-  summarise(total_count = sum(count)) %>% 
-  ungroup()
+# Measured occurrences---------------------------------------------------------
+occurrence.m <- occurrence %>%         # split off whole plot observations
+  subset(count_type == 'Individual - measured')
 
 # Join with interval data
-occurrence.wp <- left_join(occurrence.wp, rii)
+occurrence.m <- left_join(occurrence.m, rii)
 
 # Add abbreviated site names column
-occurrence.wp$site_code <- NA_character_
+occurrence.m$site_code <- NA_character_
 
-for (i in 1:length(occurrence.wp$interval)){
-  if (occurrence.wp$site_name[i] == 'North Beach'){
-    occurrence.wp$site_code[i] <- 'NB'
+for (i in 1:length(occurrence.m$interval)){
+  if (occurrence.m$site_name[i] == 'North Beach'){
+    occurrence.m$site_code[i] <- 'NB'
   } else{
-    if (occurrence.wp$site_name[i] == 'West Beach'){
-      occurrence.wp$site_code[i] <- 'WB'
+    if (occurrence.m$site_name[i] == 'West Beach'){
+      occurrence.m$site_code[i] <- 'WB'
     } else{
-      occurrence.wp$site_code[i] <- 'FB'
+      occurrence.m$site_code[i] <- 'FB'
     }
   }
 }
 
 # Add plot type code column
-occurrence.wp$type.code <- substring(occurrence.wp$plot_type, 1, 1)
+occurrence.m$type.code <- substring(occurrence.m$plot_type, 1, 1)
 
 # Build quadrat code column
-occurrence.wp$quad.code <- paste(occurrence.wp$type.code, 'Q', 
-                                 occurrence.wp$plot, sep = '')
+occurrence.m$quad.code <- paste(occurrence.m$type.code, 'Q', 
+                                 occurrence.m$plot, sep = '')
 
 # Build event ID column to match with event table
-occurrence.wp$eventID <- paste(occurrence.wp$interval, 
-                               occurrence.wp$site_code,
-                               occurrence.wp$date,
-                               occurrence.wp$quad.code,
+occurrence.m$eventID <- paste(occurrence.m$interval, 
+                               occurrence.m$site_code,
+                               occurrence.m$date,
+                               occurrence.m$quad.code,
                                sep = '_')
 
 # Join with event table
-occurrence.wp <- left_join(occurrence.wp, event)
+occurrence.m <- left_join(occurrence.m, event)
 
 # Add occurrence ID column
-occurrence.wp$observation <- 1:nrow(occurrence.wp) 
-occurrence.wp$occurrenceID <- paste('wholePlot', occurrence.wp$observation,
+occurrence.m$observation <- 1:nrow(occurrence.m) 
+occurrence.m$occurrenceID <- paste('indMeasured', occurrence.m$observation,
                                     sep = '-')
 
 # Add other missing columns
-occurrence.wp$organismQuantityType <- 'individuals'
+occurrence.m$organismQuantityType <- 'individuals measured'
 
-occurrence.wp$decimalLatitude <- NA_real_
-occurrence.wp$decimalLongitude <- NA_real_
+occurrence.m$decimalLatitude <- NA_real_
+occurrence.m$decimalLongitude <- NA_real_
 
-for (i in 1:length(occurrence.wp$interval)){
-  if (occurrence.wp$site_name[i] == 'North Beach'){
-    occurrence.wp$decimalLatitude[i] <- 51.665080
-    occurrence.wp$decimalLongitude[i] <- -128.134700
+for (i in 1:length(occurrence.m$interval)){
+  if (occurrence.m$site_name[i] == 'North Beach'){
+    occurrence.m$decimalLatitude[i] <- 51.665080
+    occurrence.m$decimalLongitude[i] <- -128.134700
   } else{
-    if (occurrence.wp$site_name[i] == 'West Beach'){
-      occurrence.wp$decimalLatitude[i] <- 51.657423
-      occurrence.wp$decimalLongitude[i] <- -128.148814
+    if (occurrence.m$site_name[i] == 'West Beach'){
+      occurrence.m$decimalLatitude[i] <- 51.657423
+      occurrence.m$decimalLongitude[i] <- -128.148814
     } else{
-      occurrence.wp$decimalLatitude[i] <- 51.640680
-      occurrence.wp$decimalLongitude[i] <- -128.156779
+      occurrence.m$decimalLatitude[i] <- 51.640680
+      occurrence.m$decimalLongitude[i] <- -128.156779
     }
   }
 }
 
-occurrence.wp$basisOfRecord <- 'HumanObservation'
-occurrence.wp$occurrenceStatus <- 'present'
+occurrence.m$basisOfRecord <- 'HumanObservation'
+occurrence.m$occurrenceStatus <- 'present'
+
+# Unmeasured occurrences-------------------------------------------------------
+occurrence.nm <- occurrence %>%         # split off whole plot observations
+  subset(count_type == 'Individual - not measured'
+         | count_type == 'Large limpets (>15mm)')
+
+# Join with interval data
+occurrence.nm <- left_join(occurrence.nm, rii)
+
+# Add abbreviated site names column
+occurrence.nm$site_code <- NA_character_
+
+for (i in 1:length(occurrence.nm$interval)){
+  if (occurrence.nm$site_name[i] == 'North Beach'){
+    occurrence.nm$site_code[i] <- 'NB'
+  } else{
+    if (occurrence.nm$site_name[i] == 'West Beach'){
+      occurrence.nm$site_code[i] <- 'WB'
+    } else{
+      occurrence.nm$site_code[i] <- 'FB'
+    }
+  }
+}
+
+# Add plot type code column
+occurrence.nm$type.code <- substring(occurrence.nm$plot_type, 1, 1)
+
+# Build quadrat code column
+occurrence.nm$quad.code <- paste(occurrence.nm$type.code, 'Q', 
+                                occurrence.nm$plot, sep = '')
+
+# Build event ID column to match with event table
+occurrence.nm$eventID <- paste(occurrence.nm$interval, 
+                              occurrence.nm$site_code,
+                              occurrence.nm$date,
+                              occurrence.nm$quad.code,
+                              sep = '_')
+
+# Join with event table
+occurrence.nm <- left_join(occurrence.nm, event)
+
+# Add occurrence ID column
+occurrence.nm$observation <- 1:nrow(occurrence.nm) 
+occurrence.nm$occurrenceID <- paste('ind', occurrence.nm$observation,
+                                   sep = '-')
+
+# Add other missing columns
+occurrence.nm$organismQuantityType <- 'individuals'
+
+occurrence.nm$decimalLatitude <- NA_real_
+occurrence.nm$decimalLongitude <- NA_real_
+
+for (i in 1:length(occurrence.nm$interval)){
+  if (occurrence.nm$site_name[i] == 'North Beach'){
+    occurrence.nm$decimalLatitude[i] <- 51.665080
+    occurrence.nm$decimalLongitude[i] <- -128.134700
+  } else{
+    if (occurrence.nm$site_name[i] == 'West Beach'){
+      occurrence.nm$decimalLatitude[i] <- 51.657423
+      occurrence.nm$decimalLongitude[i] <- -128.148814
+    } else{
+      occurrence.nm$decimalLatitude[i] <- 51.640680
+      occurrence.nm$decimalLongitude[i] <- -128.156779
+    }
+  }
+}
+
+occurrence.nm$basisOfRecord <- 'HumanObservation'
+occurrence.nm$occurrenceStatus <- 'present'
+
+# Join occurrence tables-------------------------------------------------------
+occurrence <- rbind(occurrence.m, occurrence.nm)
 
 # Select relevant columns
-occurrence.wp <- occurrence.wp %>% 
+occurrence <- occurrence.nm %>% 
   select(eventID, occurrenceID, scientific_name, total_count, 
          organismQuantityType, date, decimalLatitude, decimalLongitude,
          rank, LSID, basisOfRecord, occurrenceStatus)
 
 # Rename columns
-names(occurrence.wp) <- c('eventID', 'occurrenceID', 'scientificName',
-                          'organismQuantity', 'organismQuantityType',
-                          'eventDate', 'decimalLatitude', 'decimalLongitude',
-                          'taxonRank', 'scientificNameID', 'basisOfRecord',
-                          'occurrenceStatus')
+names(occurrence) <- c('eventID', 'occurrenceID', 'scientificName',
+                       'organismQuantity', 'organismQuantityType',
+                       'eventDate', 'decimalLatitude', 'decimalLongitude',
+                       'taxonRank', 'scientificNameID', 'basisOfRecord',
+                       'occurrenceStatus')
+                          
+# Remove unneeded elements
+rm(list = c('occurrence.nm', 'i'))
+
+#================== Measurement or Fact Extension =============================
+# Size Measurements------------------------------------------------------------
+mof.s <- mi %>% 
+  subset(!is.na(size))
