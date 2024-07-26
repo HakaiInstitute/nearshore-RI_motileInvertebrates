@@ -140,7 +140,7 @@ occurrence <- left_join(occurrence, ns.taxa.full)
 
 # Measured occurrences---------------------------------------------------------
 occurrence.m <- occurrence %>%         # split off whole plot observations
-  subset(count_type == 'Individual - measured')
+  subset(count_type == 'Individual - measured' & !is.na(size))
 
 # Join with interval data
 occurrence.m <- left_join(occurrence.m, rii)
@@ -279,10 +279,10 @@ occurrence.nm$occurrenceStatus <- 'present'
 occurrence <- rbind(occurrence.m, occurrence.nm)
 
 # Select relevant columns
-occurrence <- occurrence.nm %>% 
-  select(eventID, occurrenceID, scientific_name, total_count, 
-         organismQuantityType, date, decimalLatitude, decimalLongitude,
-         rank, LSID, basisOfRecord, occurrenceStatus)
+occurrence <- occurrence %>% 
+  select(eventID, occurrenceID, scientific_name, count, organismQuantityType, 
+         date, decimalLatitude, decimalLongitude, rank, LSID, basisOfRecord, 
+         occurrenceStatus)
 
 # Rename columns
 names(occurrence) <- c('eventID', 'occurrenceID', 'scientificName',
@@ -296,5 +296,43 @@ rm(list = c('occurrence.nm', 'i'))
 
 #================== Measurement or Fact Extension =============================
 # Size Measurements------------------------------------------------------------
-mof.s <- mi %>% 
-  subset(!is.na(size))
+mof.s <- occurrence.m
+
+# Add measurement id to size measurement table
+mof.s$measurementID <- paste(mof.s$eventID, mof.s$occurrenceID, "length")
+
+# Select relevant columns
+mof.s <- mof.s %>% 
+  select(eventID, occurrenceID, measurementID, size)
+
+# YSI Measurements-------------------------------------------------------------
+# Download data from portal
+client <- hakaiApi::Client$new()
+
+ysi <- client$get("https://hecate.hakai.org/api//eims/views/output/ysi?survey=ROCKY&limit=-1")
+
+# Remove irrelevant sites
+ysi <- ysi %>% 
+  subset(site_id == 'ROCKY03' | site_id == 'ROCKY3' | site_id == 'ROCKY06'
+         | site_id == 'ROCKY6' | site_id == 'ROCKY07' | site_id == 'ROCKY7')
+
+# Translate site codes to site names
+ysi$site_name <- NA_character_
+
+for (i in 1:length(ysi$site_id)){
+  if (ysi$site_id[i] == 'ROCKY07' | ysi$site_id[i] == 'ROCKY7'){
+    ysi$site_name[i] <- 'North Beach'
+  } else{
+    if (ysi$site_id[i] == 'ROCKY06' | ysi$site_id[i] == 'ROCKY6'){
+      ysi$site_name[i] <- 'West Beach'
+    } else{
+      ysi$site_name[i] <- 'Fifth Beach'
+    }
+  }
+}
+
+# Select columns and join to intervals
+ysi <- ysi %>% 
+  select(date, site_name, temperature, salinity)
+
+ysi <- left_join(ysi, rii)
