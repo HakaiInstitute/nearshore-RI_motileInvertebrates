@@ -299,11 +299,29 @@ rm(list = c('occurrence.nm', 'i'))
 mof.s <- occurrence.m
 
 # Add measurement id to size measurement table
-mof.s$measurementID <- paste(mof.s$eventID, mof.s$occurrenceID, "length")
+mof.s$measurementID <- paste(mof.s$eventID, mof.s$occurrenceID, "length",
+                             sep = '_')
 
 # Select relevant columns
 mof.s <- mof.s %>% 
   select(eventID, occurrenceID, measurementID, size)
+
+# Add missing columns
+mof.s$measurementType <- 'Length'
+mof.s$measurementMethod <- 'In the field'
+mof.s$measurementTypeID <- NA_character_
+mof.s$measurementUnit <- 'mm'
+mof.s$measurementUnitID <- NA_character_
+mof.s$measurementValueID <- NA_character_
+
+# Rearrange columns
+mof.s <- mof.s %>% 
+  select(eventID, occurrenceID, measurementID, measurementMethod,
+         measurementType, measurementTypeID, measurementUnit, 
+         measurementUnitID, size, measurementValueID)
+
+# Rename size column
+names(mof.s)[names(mof.s) == 'size'] <- 'measurementValue'
 
 # YSI Measurements-------------------------------------------------------------
 # Download data from portal
@@ -336,3 +354,62 @@ ysi <- ysi %>%
   select(date, site_name, temperature, salinity)
 
 ysi <- left_join(ysi, rii)
+
+# Remove surveys with no data (+ missing data - TEMPORARY!!)
+ysi <- ysi %>% 
+  drop_na(interval, salinity)
+
+# Remove duplicates
+ysi <- ysi %>% 
+  distinct(date, site_name, temperature, salinity, interval)
+
+# Add abbreviated site names column
+ysi$site_code <- NA_character_
+
+for (i in 1:length(ysi$interval)){
+  if (ysi$site_name[i] == 'North Beach'){
+    ysi$site_code[i] <- 'NB'
+  } else{
+    if (ysi$site_name[i] == 'West Beach'){
+      ysi$site_code[i] <- 'WB'
+    } else{
+      ysi$site_code[i] <- 'FB'
+    }
+  }
+}
+
+# Build eventID column
+ysi$eventID <- paste(ysi$interval, ysi$site_code, ysi$date, sep = '_')
+
+# Rearrange columns and pivot longer
+ysi.l <- ysi %>% 
+  select(eventID, temperature, salinity) %>% 
+  pivot_longer(c(temperature, salinity), names_to = 'measurementType',
+               values_to = 'measurementValue')
+
+# Change measurement type values
+for (i in 1:length(ysi.l$eventID)){
+  if (ysi.l$measurementType[i] == 'temperature'){
+    ysi.l$measurementType[i] <- 'sea_surface_temperature'
+  } else{
+      ysi.l$measurementType[i] <- 'sea_surface_salinity'
+  }
+}
+
+# Add missing columns
+ysi.l$occurrenceID <- NA_character_
+ysi.l$measurementID <- paste(ysi.l$eventID, ysi.l$measurementType, sep = '_')
+ysi.l$measurementMethod <- NA_character_
+ysi.l$measurementTypeID <- NA_character_
+ysi.l$measurementUnit <- NA_character_
+ysi.l$measurementUnitID <- NA_character_
+ysi.l$measurementValueID <- NA_character_
+
+# Rearrange columns
+ysi.l <- ysi.l %>% 
+  select(eventID, occurrenceID, measurementID, measurementMethod,
+         measurementType, measurementTypeID, measurementUnit, 
+         measurementUnitID, measurementValue, measurementValueID)
+
+# Join measurements together
+mof <- rbind(mof.s, ysi.l)
