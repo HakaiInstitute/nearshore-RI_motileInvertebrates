@@ -40,27 +40,41 @@ mi.e.int$parentEventID <- NA_character_
 mi.e.int$eventDate <- NA_Date_
 mi.e.int$sampleSizeValue <- NA_real_
 mi.e.int$sampleSizeUnit <- NA_character_
-mi.e.int$eventRemarks <- 'expedition'
+mi.e.int$eventType <- 'expedition'
+mi.e.int$eventRemarks <- NA_character_
+mi.e.int$decimalLatitude <- NA_real_
+mi.e.int$decimalLongitude <- NA_real_
+mi.e.int$coordinateUncertaintyInMeters <- NA_real_
 
 # Reorder columns
 mi.e.int <- mi.e.int %>% 
-  select(datasetName, eventID, parentEventID, eventDate, sampleSizeValue,
-         sampleSizeUnit, eventRemarks)
+  select(datasetName, eventID, parentEventID, eventDate, decimalLatitude,
+         decimalLongitude, coordinateUncertaintyInMeters, sampleSizeValue,
+         sampleSizeUnit, eventType, eventRemarks)
 
 # Event table for site visits--------------------------------------------------
 mi.e.sv <- rii # Copy interval data
 
-# Add abbreviated site names column
+# Add abbreviated site names column and lat/long columns
 mi.e.sv$site_code <- NA_character_
+mi.e.sv$decimalLatitude <- NA_real_
+mi.e.sv$decimalLongitude <- NA_real_
+mi.e.sv$coordinateUncertaintyInMeters <- 5
 
 for (i in 1:length(mi.e.sv$interval)){
   if (mi.e.sv$site_name[i] == 'North Beach'){
     mi.e.sv$site_code[i] <- 'NB'
+    mi.e.sv$decimalLatitude[i] <- 51.665080
+    mi.e.sv$decimalLongitude[i] <- -128.134700
   } else{
     if (mi.e.sv$site_name[i] == 'West Beach'){
       mi.e.sv$site_code[i] <- 'WB'
+      mi.e.sv$decimalLatitude[i] <- 51.657423
+      mi.e.sv$decimalLongitude[i] <- -128.148814
     } else{
       mi.e.sv$site_code[i] <- 'FB'
+      mi.e.sv$decimalLatitude[i] <- 51.640680
+      mi.e.sv$decimalLongitude[i] <- -128.156779
     }
   }
 }
@@ -75,15 +89,19 @@ mi.e.sv$eventID <- paste(mi.e.sv$interval,
 mi.e.sv$datasetName <- 'Hakai Institute Rocky Intertidal Invertebrates'
 mi.e.sv$sampleSizeValue <- NA_real_
 mi.e.sv$sampleSizeUnit <- NA_character_
-mi.e.sv$eventRemarks <- 'station visit'
+mi.e.sv$eventType <- 'station visit'
+mi.e.sv$eventRemarks <- NA_character_
 
 # Select relevant columns
 mi.e.sv <- mi.e.sv %>% 
-  select(datasetName, eventID, interval, date, sampleSizeValue, sampleSizeUnit,
-         eventRemarks)
+  select(datasetName, eventID, interval, date, decimalLatitude,
+         decimalLongitude, coordinateUncertaintyInMeters, sampleSizeValue, 
+         sampleSizeUnit, eventType, eventRemarks)
 
 names(mi.e.sv) <- c('datasetName', 'eventID', 'parentEventID', 'eventDate',
-                    'sampleSizeUnit', 'sampleSizeValue', 'eventRemarks')
+                    'decimalLongitude', 'decimalLatitude', 
+                    'coordinateUncertaintyInMeters', 'sampleSizeUnit',
+                    'sampleSizeValue', 'eventType', 'eventRemarks')
 
 # Event table for quadrats-----------------------------------------------------
 # Copy survey data and find distinct quadrats
@@ -104,32 +122,136 @@ names(mi.e.quad) <- c('eventDate', 'site_name', 'plot_type', 'plot',
 # Join with site visit data
 mi.e.quad <- left_join(mi.e.quad, mi.e.sv)
 
+# Add lat/long columns
+mi.e.quad.coord <- read_csv('obis/quadrat_locations.csv')
+mi.e.quad <- left_join(mi.e.quad, mi.e.quad.coord)
+mi.e.quad$coordinateUncertaintyInMeters <- 0.1
+
 # Select relevant columns
 mi.e.quad <- mi.e.quad %>% 
-  select(datasetName, quad.code, eventID)
+  select(datasetName, eventDate, quad.code, eventID, quadratLatitude, 
+         quadratLongitude, coordinateUncertaintyInMeters)
 
 # Build the quad event column
 mi.e.quad$quad.code <- paste(mi.e.quad$eventID, mi.e.quad$quad.code, sep = '_')
 
-
 # Add missing columns
-mi.e.quad$eventDate <- NA_Date_
 mi.e.quad$sampleSizeValue <- 0.38
 mi.e.quad$sampleSizeUnit <- 'square meter'
-mi.e.quad$eventRemarks <- 'quadrat'
+mi.e.quad$eventType <- 'quadrat'
+mi.e.quad$eventRemarks <- 'Only Lottia spp. with length > 15mm were counted'
 
-# Rename columns
+# Select relevant columns
+mi.e.quad <- mi.e.quad %>% 
+  select(datasetName, eventID, quad.code, eventDate, quadratLatitude,
+         quadratLongitude, coordinateUncertaintyInMeters, sampleSizeValue, 
+         sampleSizeUnit, eventType, eventRemarks)
+
 names(mi.e.quad) <- c('datasetName', 'eventID', 'parentEventID', 'eventDate',
-                      'sampleSizeValue', 'sampleSizeUnit', 'eventRemarks')
+                    'decimalLongitude', 'decimalLatitude', 
+                    'coordinateUncertaintyInMeters', 'sampleSizeUnit',
+                    'sampleSizeValue', 'eventType', 'eventRemarks')
 
-# Join events together into single dataset
-event <- rbind(mi.e.int, mi.e.sv, mi.e.quad)
+# Event table for sub-quadrats-------------------------------------------------
+mi.e.subquad <- mi %>% 
+  subset(count_type == 'Littorines') %>% 
+  distinct(date, site_name, plot_type, plot, subplot_location, subplot_size)
+
+# Add plot type code column
+mi.e.subquad$type.code <- substring(mi.e.subquad$plot_type, 1, 1)
+
+# Build quadrat code column
+mi.e.subquad$quad.code <- paste(mi.e.subquad$type.code, 'Q', mi.e.subquad$plot, 
+                                sep = '')
+
+# Build sub-quadrat code column
+mi.e.subquad$subquad.code <- NA_character_
+
+for (i in 1:length(mi.e.subquad$date)){
+  if (mi.e.subquad$subplot_location[i] == 'top left (1)'){
+    mi.e.subquad$subquad.code[i] <- '1'
+  } else{
+    if (mi.e.subquad$subplot_location[i] == 'middle (2)'){
+      mi.e.subquad$subquad.code[i] <- '2'
+    } else{
+      mi.e.subquad$subquad.code[i] <- '3'
+    }
+  }
+}
+
+# Join to intervals dataset
+mi.e.subquad <- left_join(mi.e.subquad, rii)
+
+# Build parentEventID column
+mi.e.subquad$site_code <- NA_character_
+
+for (i in 1:length(mi.e.subquad$interval)){
+  if (mi.e.subquad$site_name[i] == 'North Beach'){
+    mi.e.subquad$site_code[i] <- 'NB'
+  } else{
+    if (mi.e.subquad$site_name[i] == 'West Beach'){
+      mi.e.subquad$site_code[i] <- 'WB'
+    } else{
+      mi.e.subquad$site_code[i] <- 'FB'
+    }
+  }
+}
+
+mi.e.subquad$parentEventID <- paste(mi.e.subquad$interval, 
+                                    mi.e.subquad$site_code,
+                                    mi.e.subquad$date,
+                                    mi.e.subquad$quad.code, 
+                                    mi.e.subquad$subquad.code,
+                                    sep = '_')
+
+# Build event ID column
+mi.e.subquad$eventID <- paste(mi.e.subquad$parentEventID, 
+                              mi.e.subquad$subquad.code,
+                              sep = '_')
+
+# Add sample size column
+mi.e.subquad$sampleSizeValue <- NA_real_
+
+for (i in 1:length(mi.e.subquad$interval)){
+  if (mi.e.subquad$subplot_size[i] == '10cm x 10cm'){
+    mi.e.subquad$sampleSizeValue[i] <- 0.01
+    } else{
+      mi.e.subquad$sampleSizeValue[i] <- 0.04
+    }
+  }
+
+# Add other event core columns
+mi.e.subquad$datasetName <- 'Hakai Institute Rocky Intertidal Invertebrates'
+mi.e.subquad$sampleSizeUnit <- 'square meter'
+mi.e.subquad$eventType <- 'sub-quadrat'
+mi.e.subquad$eventRemarks <- NA_character_
+mi.e.subquad$decimalLatitude <- NA_real_
+mi.e.subquad$decimalLongitude <- NA_real_
+mi.e.subquad$coordinateUncertaintyInMeters <- NA_real_
+
+# Select relevant columns
+mi.e.subquad <- mi.e.subquad %>% 
+  select(datasetName, eventID, parentEventID, date, decimalLatitude,
+         decimalLongitude, coordinateUncertaintyInMeters, sampleSizeValue, 
+         sampleSizeUnit, eventType, eventRemarks)
+
+names(mi.e.subquad) <- c('datasetName', 'eventID', 'parentEventID', 'eventDate',
+                         'decimalLongitude', 'decimalLatitude', 
+                         'coordinateUncertaintyInMeters', 'sampleSizeUnit',
+                         'sampleSizeValue', 'eventType', 'eventRemarks')
+                      
+
+# Join events together into single dataset-------------------------------------
+event <- rbind(mi.e.int, mi.e.sv, mi.e.quad, mi.e.subquad)
+
+# Add sampling protocol column
+event$samplingProtocol <- 'https://github.com/HakaiInstitute/nearshore-RI_motileInvertebrates/blob/eaebf4b2b252b48ba79eae92e32e5f8b6d6f2ac1/protocols/rocky_intertidal-protocol.pdf'
 
 # Remove duplicated rows
 event <- unique(event)
 
 # Remove unneeded elements
-rm(list = c('mi.e.int', 'mi.e.quad', 'mi.e.sv', 'i'))
+rm(list = c('mi.e.int', 'mi.e.quad', 'mi.e.quad', 'i'))
 
 #================== Occurrence Extension ======================================
 # Copy survey data
@@ -184,24 +306,6 @@ occurrence.m$occurrenceID <- paste('indMeasured', occurrence.m$observation,
 
 # Add other missing columns
 occurrence.m$organismQuantityType <- 'individuals measured'
-
-occurrence.m$decimalLatitude <- NA_real_
-occurrence.m$decimalLongitude <- NA_real_
-
-for (i in 1:length(occurrence.m$interval)){
-  if (occurrence.m$site_name[i] == 'North Beach'){
-    occurrence.m$decimalLatitude[i] <- 51.665080
-    occurrence.m$decimalLongitude[i] <- -128.134700
-  } else{
-    if (occurrence.m$site_name[i] == 'West Beach'){
-      occurrence.m$decimalLatitude[i] <- 51.657423
-      occurrence.m$decimalLongitude[i] <- -128.148814
-    } else{
-      occurrence.m$decimalLatitude[i] <- 51.640680
-      occurrence.m$decimalLongitude[i] <- -128.156779
-    }
-  }
-}
 
 occurrence.m$basisOfRecord <- 'HumanObservation'
 occurrence.m$occurrenceStatus <- 'present'
