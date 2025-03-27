@@ -17,8 +17,8 @@ and/or collaborate with Hakai Nearshore researchers if you are considering
 using this dataset for manuscripts or other forms of reporting.
 
 ```
-Froese, T., Sadlier-Brown, G., Hessing-Lewis, M., Gehman, A. (2023). 
-Motile Invertebrate Surveys - BC Central Coast (v3.1.0) 
+Froese, T., Sadlier-Brown, G., Hessing-Lewis, M., Gehman, A. (2024). 
+Motile Invertebrate Surveys - BC Central Coast (v3.2.0) 
 [Data set]. https://doi.org/10.21966/0052-wk15
 ```
 
