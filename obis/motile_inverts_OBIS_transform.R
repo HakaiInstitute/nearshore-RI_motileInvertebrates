@@ -14,14 +14,19 @@ library(tidyverse)
 library(googlesheets4)
 library(rairtable)
 library(worrms)
+library(obistools)
 
 # Load most up to date QCd data
 mi <- read_csv('./data/motile_invertebrates-surveys.csv')
 
-# Download RI intervals google sheet
+# Download RI intervals google sheet and subset by max survey date
 rii <- read_sheet(ss = '1Jlbt_-rvoGA6V6EQtIdmaxYnlaru0fZMS52EcN5pIGE',
                   sheet = 'Sheet1',
-                  col_types = 'cDc')
+                  col_types = 'cDc') %>% 
+  subset(date <= max(mi$date))
+
+# Add year to intervals
+rii$year <- year(rii$date)
 
 # Join intervals to survey data
 mi <- left_join(mi, rii)
@@ -31,13 +36,18 @@ source('./obis/source_taxonomy.R')
 
 #================== Event Core ================================================
 # Event table for expeditions--------------------------------------------------
-mi.e.int <- distinct(rii, interval) # Get distinct intervals
-names(mi.e.int) <- c('eventID') # Rename column
+# Get distinct intervals and years
+mi.e.int <- distinct(rii, interval, year) # Get distinct intervals
+
+names(mi.e.int) <- c('eventID', 'year') # Rename columns
 
 # Add other event core columns
 mi.e.int$datasetName <- 'Hakai Institute Rocky Intertidal Invertebrates'
 mi.e.int$parentEventID <- NA_character_
+mi.e.int$verbatimLocality <- NA_character_
 mi.e.int$eventDate <- NA_Date_
+mi.e.int$month <- NA_real_
+mi.e.int$day <- NA_real_
 mi.e.int$sampleSizeValue <- NA_real_
 mi.e.int$sampleSizeUnit <- NA_character_
 mi.e.int$eventType <- 'expedition'
@@ -50,11 +60,14 @@ mi.e.int$maximumDistanceAboveSurfaceInMeters <- NA_real_
 
 # Reorder columns
 mi.e.int <- mi.e.int %>% 
-  select(datasetName, eventID, parentEventID, eventDate, decimalLatitude,
-         decimalLongitude, coordinateUncertaintyInMeters,
-         minimumDistanceAboveSurfaceInMeters, 
+  select(datasetName, eventID, parentEventID, verbatimLocality, eventDate,
+         year, month, day, decimalLatitude, decimalLongitude, 
+         coordinateUncertaintyInMeters, minimumDistanceAboveSurfaceInMeters, 
          maximumDistanceAboveSurfaceInMeters, sampleSizeValue, sampleSizeUnit, 
          eventType, eventRemarks)
+
+# Start building event table
+event <- mi.e.int
 
 # Event table for site visits--------------------------------------------------
 mi.e.sv <- rii # Copy interval data
@@ -83,6 +96,9 @@ mi.e.sv$eventID <- paste(mi.e.sv$interval,
 
 # Add other event core columns
 mi.e.sv$datasetName <- 'Hakai Institute Rocky Intertidal Invertebrates'
+mi.e.sv$verbatimLocality <- mi.e.sv$site_name
+mi.e.sv$month <- month(mi.e.sv$date)
+mi.e.sv$day <- day(mi.e.sv$date)
 mi.e.sv$sampleSizeValue <- NA_real_
 mi.e.sv$sampleSizeUnit <- NA_character_
 mi.e.sv$eventType <- 'station visit'
@@ -92,18 +108,22 @@ mi.e.sv$maximumDistanceAboveSurfaceInMeters <- 5
 
 # Select relevant columns
 mi.e.sv <- mi.e.sv %>% 
-  select(datasetName, eventID, interval, date, decimalLatitude,
-         decimalLongitude, coordinateUncertaintyInMeters,
+  select(datasetName, eventID, interval, verbatimLocality, date, year, month, 
+         day, decimalLatitude, decimalLongitude, coordinateUncertaintyInMeters,
          minimumDistanceAboveSurfaceInMeters, 
          maximumDistanceAboveSurfaceInMeters, sampleSizeValue, sampleSizeUnit,
          eventType, eventRemarks)
 
-names(mi.e.sv) <- c('datasetName', 'eventID', 'parentEventID', 'eventDate',
+names(mi.e.sv) <- c('datasetName', 'eventID', 'parentEventID', 
+                    'verbatimLocality', 'eventDate', 'year', 'month', 'day',
                     'decimalLatitude', 'decimalLongitude', 
                     'coordinateUncertaintyInMeters',
                     'minimumDistanceAboveSurfaceInMeters',
                     'maximumDistanceAboveSurfaceInMeters', 'sampleSizeUnit',
                     'sampleSizeValue', 'eventType', 'eventRemarks')
+
+# Add to event table
+event <- rbind(event, mi.e.sv)
 
 # Event table for quadrats-----------------------------------------------------
 # Copy survey data and find distinct quadrats
@@ -132,33 +152,45 @@ mi.e.quad$coordinateUncertaintyInMeters <- 0.1
 # Select relevant columns
 mi.e.quad <- mi.e.quad %>% 
   select(datasetName, eventDate, quad.code, eventID, quadratLatitude, 
-         quadratLongitude, coordinateUncertaintyInMeters)
+         quadratLongitude, quadrat_elevation, coordinateUncertaintyInMeters)
 
 # Build the quad event column
 mi.e.quad$quad.code <- paste(mi.e.quad$eventID, mi.e.quad$quad.code, sep = '_')
 
 # Add missing columns
+mi.e.quad$year <- NA_real_
+mi.e.quad$month <- NA_real_
+mi.e.quad$day <- NA_real_
+mi.e.quad$verbatimLocality <- NA_character_
 mi.e.quad$sampleSizeValue <- 0.38
 mi.e.quad$sampleSizeUnit <- 'square meter'
 mi.e.quad$eventType <- 'quadrat'
 mi.e.quad$eventRemarks <- 'Only Lottia spp. with length > 15mm were counted'
-mi.e.quad$minimumDistanceAboveSurfaceInMeters <- NA_real_
-mi.e.quad$maximumDistanceAboveSurfaceInMeters <- NA_real_
+mi.e.quad$minimumDistanceAboveSurfaceInMeters <- mi.e.quad$quadrat_elevation
+mi.e.quad$maximumDistanceAboveSurfaceInMeters <- mi.e.quad$quadrat_elevation
 
 # Select relevant columns
 mi.e.quad <- mi.e.quad %>% 
-  select(datasetName, quad.code, eventID, eventDate, quadratLatitude,
-         quadratLongitude, coordinateUncertaintyInMeters,
-         minimumDistanceAboveSurfaceInMeters, 
+  select(datasetName, quad.code, eventID, verbatimLocality, eventDate,
+         year, month, day, quadratLatitude, quadratLongitude, 
+         coordinateUncertaintyInMeters, minimumDistanceAboveSurfaceInMeters, 
          maximumDistanceAboveSurfaceInMeters, sampleSizeValue, sampleSizeUnit, 
          eventType, eventRemarks)
 
-names(mi.e.quad) <- c('datasetName', 'eventID', 'parentEventID', 'eventDate',
+names(mi.e.quad) <- c('datasetName', 'eventID', 'parentEventID',
+                      'verbatimLocality', 'eventDate', 'year', 'month', 'day', 
                       'decimalLatitude', 'decimalLongitude', 
                       'coordinateUncertaintyInMeters', 
                       'minimumDistanceAboveSurfaceInMeters',
                       'maximumDistanceAboveSurfaceInMeters', 'sampleSizeUnit',
                       'sampleSizeValue', 'eventType', 'eventRemarks')
+
+# Add to event table and flatten events
+event <- rbind(event, mi.e.quad)
+
+event <- flatten_event(event = event, fields = c('verbatimLocality',
+                                                 'eventDate', 'year', 'month',
+                                                 'day'))
 
 # Event table for sub-quadrats-------------------------------------------------
 mi.e.subquad <- mi %>% 
@@ -208,6 +240,10 @@ mi.e.subquad$sampleSizeValue <- ifelse(mi.e.subquad$subplot_size == '10cm x 10cm
 
 # Add other event core columns
 mi.e.subquad$datasetName <- 'Hakai Institute Rocky Intertidal Invertebrates'
+mi.e.subquad$verbatimLocality <- NA_character_
+mi.e.subquad$year <- NA_real_
+mi.e.subquad$month <- NA_real_
+mi.e.subquad$day <- NA_real_
 mi.e.subquad$sampleSizeUnit <- 'square meter'
 mi.e.subquad$eventType <- 'sub-quadrat'
 mi.e.subquad$eventRemarks <- NA_character_
@@ -219,14 +255,16 @@ mi.e.subquad$maximumDistanceAboveSurfaceInMeters <- NA_real_
 
 # Select relevant columns
 mi.e.subquad <- mi.e.subquad %>% 
-  select(datasetName, eventID, parentEventID, date, decimalLatitude, 
-         decimalLongitude, coordinateUncertaintyInMeters,
+  select(datasetName, eventID, parentEventID, verbatimLocality, date, year,
+         month, day, decimalLatitude, decimalLongitude, 
+         coordinateUncertaintyInMeters,
          minimumDistanceAboveSurfaceInMeters,
          maximumDistanceAboveSurfaceInMeters, sampleSizeValue, 
          sampleSizeUnit, eventType, eventRemarks)
 
-names(mi.e.subquad) <- c('datasetName', 'eventID', 'parentEventID', 'eventDate',
-                         'decimalLatitude', 'decimalLongitude', 
+names(mi.e.subquad) <- c('datasetName', 'eventID', 'parentEventID', 
+                         'verbatimLocality', 'eventDate', 'year', 'month', 
+                         'day', 'decimalLatitude', 'decimalLongitude', 
                          'coordinateUncertaintyInMeters', 
                          'minimumDistanceAboveSurfaceInMeters',
                          'maximumDistanceAboveSurfaceInMeters', 'sampleSizeUnit',
@@ -234,13 +272,43 @@ names(mi.e.subquad) <- c('datasetName', 'eventID', 'parentEventID', 'eventDate',
                       
 
 # Join events together into single dataset-------------------------------------
-event <- rbind(mi.e.int, mi.e.sv, mi.e.quad, mi.e.subquad)
+event <- rbind(event, mi.e.subquad)
 
+# Flatten events
+event <- flatten_event(event = event, 
+                       fields = c('verbatimLocality', 'year', 'day', 'month',
+                                  'decimalLatitude', 'decimalLongitude',
+                                  'coordinateUncertaintyInMeters',
+                                  'minimumDistanceAboveSurfaceInMeters',
+                                  'maximumDistanceAboveSurfaceInMeters'))
+                        
 # Add sampling protocol column
 event$samplingProtocol <- 'https://github.com/HakaiInstitute/nearshore-RI_motileInvertebrates/blob/eaebf4b2b252b48ba79eae92e32e5f8b6d6f2ac1/protocols/rocky_intertidal-protocol.pdf'
 
-# Remove duplicated rows
-event <- unique(event)
+# Add language column
+event$language <- 'en'
+
+# Add license column
+event$license <- 'https://github.com/HakaiInstitute/nearshore-RI_motileInvertebrates/blob/main/LICENSE'
+
+# Add citation column
+event$bibliographicCitation <- 'Froese, T., Sadlier-Brown, G., Hessing-Lewis, M., & Gehman, A.-L. (2024). Motile Invertebrate Surveys - BC Central Coast (3.2.0) [Data set]. Hakai Institute. https://doi.org/10.21966/0052-wk15'
+
+# Add rights holder column
+event$rightsHolder <- 'Hakai Institute'
+
+# Add institution code
+event$institutionCode <- 'https://edmo.seadatanet.org/report/5148'
+
+# Add country & country code
+event$country <- 'Canada'
+event$countryCode <- 'CA'
+
+#Add geodetic column
+event$geodeticDatum <- 'WGS84'
+
+# Add modified column
+event$modified <- lubridate::today()
 
 #================== Occurrence Extension ======================================
 # Copy survey data
