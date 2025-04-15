@@ -57,14 +57,15 @@ mi.e.int$decimalLongitude <- NA_real_
 mi.e.int$coordinateUncertaintyInMeters <- NA_real_
 mi.e.int$minimumDistanceAboveSurfaceInMeters <- NA_real_
 mi.e.int$maximumDistanceAboveSurfaceInMeters <- NA_real_
+mi.e.int$habitat <- NA_character_
 
 # Reorder columns
 mi.e.int <- mi.e.int %>% 
   select(datasetName, eventID, parentEventID, verbatimLocality, eventDate,
          year, month, day, decimalLatitude, decimalLongitude, 
          coordinateUncertaintyInMeters, minimumDistanceAboveSurfaceInMeters, 
-         maximumDistanceAboveSurfaceInMeters, sampleSizeValue, sampleSizeUnit, 
-         eventType, eventRemarks)
+         maximumDistanceAboveSurfaceInMeters, habitat, sampleSizeValue, 
+         sampleSizeUnit, eventType, eventRemarks)
 
 # Start building event table
 event <- mi.e.int
@@ -105,22 +106,24 @@ mi.e.sv$eventType <- 'station visit'
 mi.e.sv$eventRemarks <- NA_character_
 mi.e.sv$minimumDistanceAboveSurfaceInMeters <- -0.1
 mi.e.sv$maximumDistanceAboveSurfaceInMeters <- 5
+mi.e.sv$habitat <- NA_character_
 
 # Select relevant columns
 mi.e.sv <- mi.e.sv %>% 
   select(datasetName, eventID, interval, verbatimLocality, date, year, month, 
          day, decimalLatitude, decimalLongitude, coordinateUncertaintyInMeters,
          minimumDistanceAboveSurfaceInMeters, 
-         maximumDistanceAboveSurfaceInMeters, sampleSizeValue, sampleSizeUnit,
-         eventType, eventRemarks)
+         maximumDistanceAboveSurfaceInMeters, habitat, sampleSizeValue,
+         sampleSizeUnit, eventType, eventRemarks)
 
 names(mi.e.sv) <- c('datasetName', 'eventID', 'parentEventID', 
                     'verbatimLocality', 'eventDate', 'year', 'month', 'day',
                     'decimalLatitude', 'decimalLongitude', 
                     'coordinateUncertaintyInMeters',
                     'minimumDistanceAboveSurfaceInMeters',
-                    'maximumDistanceAboveSurfaceInMeters', 'sampleSizeUnit',
-                    'sampleSizeValue', 'eventType', 'eventRemarks')
+                    'maximumDistanceAboveSurfaceInMeters', 'habitat',
+                    'sampleSizeUnit', 'sampleSizeValue', 'eventType', 
+                    'eventRemarks')
 
 # Add to event table
 event <- rbind(event, mi.e.sv)
@@ -169,21 +172,28 @@ mi.e.quad$eventRemarks <- 'Only Lottia spp. with length > 15mm were counted'
 mi.e.quad$minimumDistanceAboveSurfaceInMeters <- mi.e.quad$quadrat_elevation
 mi.e.quad$maximumDistanceAboveSurfaceInMeters <- mi.e.quad$quadrat_elevation
 
+mi.e.quad$habitat <- ifelse(grepl('BQ', mi.e.quad$quad.code), 
+                            'rocky intertidal dominated by barnacle species',
+                            ifelse(grepl('FQ', mi.e.quad$quad.code),
+                                   'rocky intertidal dominated by Fucus distichus',
+                                   'rocky intertidal dominated by Mytilus californianus'))
+
 # Select relevant columns
 mi.e.quad <- mi.e.quad %>% 
   select(datasetName, quad.code, eventID, verbatimLocality, eventDate,
          year, month, day, quadratLatitude, quadratLongitude, 
          coordinateUncertaintyInMeters, minimumDistanceAboveSurfaceInMeters, 
-         maximumDistanceAboveSurfaceInMeters, sampleSizeValue, sampleSizeUnit, 
-         eventType, eventRemarks)
+         maximumDistanceAboveSurfaceInMeters, habitat, sampleSizeValue, 
+         sampleSizeUnit, eventType, eventRemarks)
 
 names(mi.e.quad) <- c('datasetName', 'eventID', 'parentEventID',
                       'verbatimLocality', 'eventDate', 'year', 'month', 'day', 
                       'decimalLatitude', 'decimalLongitude', 
                       'coordinateUncertaintyInMeters', 
                       'minimumDistanceAboveSurfaceInMeters',
-                      'maximumDistanceAboveSurfaceInMeters', 'sampleSizeUnit',
-                      'sampleSizeValue', 'eventType', 'eventRemarks')
+                      'maximumDistanceAboveSurfaceInMeters', 'habitat',
+                      'sampleSizeUnit', 'sampleSizeValue', 'eventType', 
+                      'eventRemarks')
 
 # Add to event table and flatten events
 event <- rbind(event, mi.e.quad)
@@ -252,6 +262,7 @@ mi.e.subquad$decimalLongitude <- NA_real_
 mi.e.subquad$coordinateUncertaintyInMeters <- NA_real_
 mi.e.subquad$minimumDistanceAboveSurfaceInMeters <- NA_real_
 mi.e.subquad$maximumDistanceAboveSurfaceInMeters <- NA_real_
+mi.e.subquad$habitat <- NA_character_
 
 # Select relevant columns
 mi.e.subquad <- mi.e.subquad %>% 
@@ -259,7 +270,7 @@ mi.e.subquad <- mi.e.subquad %>%
          month, day, decimalLatitude, decimalLongitude, 
          coordinateUncertaintyInMeters,
          minimumDistanceAboveSurfaceInMeters,
-         maximumDistanceAboveSurfaceInMeters, sampleSizeValue, 
+         maximumDistanceAboveSurfaceInMeters, habitat, sampleSizeValue, 
          sampleSizeUnit, eventType, eventRemarks)
 
 names(mi.e.subquad) <- c('datasetName', 'eventID', 'parentEventID', 
@@ -267,8 +278,9 @@ names(mi.e.subquad) <- c('datasetName', 'eventID', 'parentEventID',
                          'day', 'decimalLatitude', 'decimalLongitude', 
                          'coordinateUncertaintyInMeters', 
                          'minimumDistanceAboveSurfaceInMeters',
-                         'maximumDistanceAboveSurfaceInMeters', 'sampleSizeUnit',
-                         'sampleSizeValue', 'eventType', 'eventRemarks')
+                         'maximumDistanceAboveSurfaceInMeters', 'habitat',
+                         'sampleSizeUnit', 'sampleSizeValue', 'eventType', 
+                         'eventRemarks')
                       
 
 # Join events together into single dataset-------------------------------------
@@ -280,7 +292,8 @@ event <- flatten_event(event = event,
                                   'decimalLatitude', 'decimalLongitude',
                                   'coordinateUncertaintyInMeters',
                                   'minimumDistanceAboveSurfaceInMeters',
-                                  'maximumDistanceAboveSurfaceInMeters'))
+                                  'maximumDistanceAboveSurfaceInMeters',
+                                  'habitat'))
                         
 # Add sampling protocol column
 event$samplingProtocol <- 'https://github.com/HakaiInstitute/nearshore-RI_motileInvertebrates/blob/eaebf4b2b252b48ba79eae92e32e5f8b6d6f2ac1/protocols/rocky_intertidal-protocol.pdf'
@@ -317,6 +330,9 @@ occurrence <- mi
 # Join with taxonomic data
 occurrence <- left_join(occurrence, ns.taxa)
 
+# Add vitality column
+occurrence$vitality <- ifelse(grepl('dead', occurrence$notes), 'dead', 'alive')
+
 # Measured occurrences---------------------------------------------------------
 occurrence.m <- occurrence %>%         # split off whole plot observations
   subset(count_type == 'Individual - measured' & !is.na(size))
@@ -349,29 +365,20 @@ occurrence.m$eventID <- paste(occurrence.m$interval,
 occurrence.m <- left_join(occurrence.m, event)
 
 # Add other missing columns
-occurrence.m$measurementType <- 'individualCount'
-occurrence.m$measurementTypeID <- 'https://vocab.nerc.ac.uk/collection/P01/current/OCOUNT01/'
-occurrence.m$measurementValueID <- NA_character_
-occurrence.m$measurementUnit <- 'dimensionless'
-occurrence.m$measurementUnitID <- 'https://vocab.nerc.ac.uk/collection/P06/current/UUUU/'
 occurrence.m$basisOfRecord <- 'HumanObservation'
 occurrence.m$occurrenceStatus <- 'present'
 occurrence.m$tag <- 'measured individuals'
 
 # Select required columns and change names
 occurrence.m <- occurrence.m %>% 
-  select(eventID, scientific_name, rank, LSID, common_name, 
-         measurementType, measurementTypeID, count, measurementValueID,
-         measurementUnit, measurementUnitID, basisOfRecord, occurrenceStatus, 
-         notes, tag, size)
+  select(eventID, scientific_name, rank, LSID, common_name, vitality, count, 
+         basisOfRecord, occurrenceStatus, notes, tag, size)
 
 names(occurrence.m) <- c('eventID', 'scientificName', 'taxonRank', 
-                         'scientificNameID', 'vernacularName', 
-                         'measurementType', 'measurementTypeID', 
-                         'measurementValue', 'measurementValueID',
-                         'measurementUnit', 'measurementUnitID', 
-                         'basisOfRecord', 'occurrenceStatus', 
-                         'occurrenceRemarks', 'tag', 'size')
+                         'scientificNameID', 'vernacularName', 'vitality',
+                         'individualCount', 'basisOfRecord', 
+                         'occurrenceStatus', 'occurrenceRemarks', 'tag', 
+                         'size')
 
 # Unmeasured occurrences-------------------------------------------------------
 occurrence.nm <- occurrence %>%         # split off whole plot observations
@@ -406,11 +413,6 @@ occurrence.nm$eventID <- paste(occurrence.nm$interval,
 occurrence.nm <- left_join(occurrence.nm, event)
 
 # Add other missing columns
-occurrence.nm$measurementType <- 'individualCount'
-occurrence.nm$measurementTypeID <- 'https://vocab.nerc.ac.uk/collection/P01/current/OCOUNT01/'
-occurrence.nm$measurementValueID <- NA_character_
-occurrence.nm$measurementUnit <- 'dimensionless'
-occurrence.nm$measurementUnitID <- 'https://vocab.nerc.ac.uk/collection/P06/current/UUUU/'
 occurrence.nm$basisOfRecord <- 'HumanObservation'
 occurrence.nm$occurrenceStatus <- 'present'
 occurrence.nm$tag <- 'counted individuals'
@@ -418,20 +420,15 @@ occurrence.nm$size <- NA_real_
 
 # Select required columns and change names
 occurrence.nm <- occurrence.nm %>% 
-  select(eventID, scientific_name, rank, LSID, common_name, 
-         measurementType, measurementTypeID, count, measurementValueID,
-         measurementUnit, measurementUnitID, basisOfRecord, occurrenceStatus, 
-         notes, tag, size)
+  select(eventID, scientific_name, rank, LSID, common_name, vitality, count, 
+         basisOfRecord, occurrenceStatus, notes, tag, size)
 
 names(occurrence.nm) <- c('eventID', 'scientificName', 'taxonRank', 
-                          'scientificNameID', 'vernacularName', 
-                          'measurementType', 'measurementTypeID', 
-                          'measurementValue', 'measurementValueID',
-                          'measurementUnit', 'measurementUnitID', 
-                          'basisOfRecord', 'occurrenceStatus', 
-                          'occurrenceRemarks', 'tag', 'size')
+                          'scientificNameID', 'vernacularName', 'vitality',
+                          'individualCount', 'basisOfRecord', 
+                          'occurrenceStatus', 'occurrenceRemarks', 'tag', 
+                          'size')
                          
-
 # Littorine occurrences--------------------------------------------------------
 occurrence.l <- occurrence %>%         # split off littorine observations
   subset(count_type == 'Littorines')
@@ -469,11 +466,6 @@ occurrence.l$eventID <- paste(occurrence.l$interval,
                               sep = '_')
                                
 # Add other missing columns
-occurrence.l$measurementType <- 'individualCount'
-occurrence.l$measurementTypeID <- 'https://vocab.nerc.ac.uk/collection/P01/current/OCOUNT01/'
-occurrence.l$measurementValueID <- NA_character_
-occurrence.l$measurementUnit <- 'dimensionless'
-occurrence.l$measurementUnitID <- 'https://vocab.nerc.ac.uk/collection/P06/current/UUUU/'
 occurrence.l$basisOfRecord <- 'HumanObservation'
 occurrence.l$occurrenceStatus <- 'present'
 occurrence.l$tag <- 'counted individuals'
@@ -481,71 +473,76 @@ occurrence.l$size <- NA_real_
 
 # Select required columns and change names
 occurrence.l <- occurrence.l %>% 
-  select(eventID, scientific_name, rank, LSID, common_name, 
-         measurementType, measurementTypeID, count, measurementValueID,
-         measurementUnit, measurementUnitID, basisOfRecord, occurrenceStatus, 
-         notes, tag, size)
+  select(eventID, scientific_name, rank, LSID, common_name, vitality, count, 
+         basisOfRecord, occurrenceStatus, notes, tag, size)
 
 names(occurrence.l) <- c('eventID', 'scientificName', 'taxonRank',
-                         'scientificNameID', 'vernacularName', 
-                         'measurementType', 'measurementTypeID', 
-                         'measurementValue', 'measurementValueID',
-                         'measurementUnit', 'measurementUnitID', 
-                         'basisOfRecord', 'occurrenceStatus', 
-                         'occurrenceRemarks', 'tag', 'size')
+                         'scientificNameID', 'vernacularName', 'vitality',
+                         'individualCount', 'basisOfRecord', 
+                         'occurrenceStatus', 'occurrenceRemarks', 'tag', 
+                         'size')
                           
 # Join biological occurrences--------------------------------------------------
 authority <- read_csv('./obis/authority.csv')
 
 # Join life observations and add missing columns
-occurrence.life <- rbind(occurrence.nm, occurrence.m, occurrence.l)
+occurrence <- rbind(occurrence.nm, occurrence.m, occurrence.l)
 
-occurrence.life$occurrenceID <- paste(occurrence.life$eventID,
-                                       rownames(occurrence.life),
-                                       sep = '_')
-
-occurrence.life <- left_join(occurrence.life, authority,
-                             by = c('scientificName' = 'scientific_name'))
-
+occurrence$occurrenceID <- paste(occurrence.life$eventID,
+                                 rownames(occurrence.life),
+                                 sep = '_')
+                                       
+occurrence <- left_join(occurrence, authority,
+                        by = c('scientificName' = 'scientific_name'))
 
 # Select columns
-occurrence.life <- occurrence.life %>% 
-  select(eventID, occurrenceID, scientificName, scientificNameID, taxonRank,
-         authority, vernacularName, measurementType, measurementTypeID, 
-         measurementValue, measurementValueID, measurementUnit, 
-         measurementUnitID, basisOfRecord, occurrenceStatus, occurrenceRemarks,
-         tag, size)
-  
-# CMECS occurrences------------------------------------------------------------
+occurrence <- occurrence %>% 
+  select(eventID, occurrenceID, scientific_name_full, scientificNameID, 
+         taxonRank, vernacularName, vitality, individualCount, basisOfRecord, 
+         occurrenceStatus, occurrenceRemarks, tag, size)
+ 
+# Change authority column name
+names(occurrence)[names(occurrence) == 'scientific_name_full'] <- 'scientificName'
+
+# Make tagged version of occurrence
+occurrence.tag <- occurrence
+
+occurrence <- occurrence %>% select(-c(tag, size))
+
+#================== Measurement or Fact Extension =============================
+# CMECS descriptors------------------------------------------------------------
 # Copy survey data and find distinct quadrats
-occurrence.cmec <- mi %>% 
+mof.cmec <- mi %>% 
   distinct(date, site_name, plot_type, plot)
 
-occurrence.cmec$site_code <- ifelse(occurrence.cmec$site_name == "North Beach", "NB",
-                                 ifelse(occurrence.cmec$site_name == "West Beach", 
-                                        "WB", "FB"))
+mof.cmec$site_code <- ifelse(mof.cmec$site_name == "North Beach", "NB",
+                                    ifelse(mof.cmec$site_name == "West Beach", 
+                                           "WB", "FB"))
 # Add plot type code column
-occurrence.cmec$type.code <- substring(occurrence.cmec$plot_type, 1, 1)
+mof.cmec$type.code <- substring(mof.cmec$plot_type, 1, 1)
 
 # Build quadrat code column
-occurrence.cmec$quad.code <- paste(occurrence.cmec$type.code, 'Q', 
-                                   occurrence.cmec$plot, 
+mof.cmec$quad.code <- paste(mof.cmec$type.code, 'Q', 
+                                   mof.cmec$plot, 
                                    sep = '')
 
 # Join to interval data
-occurrence.cmec <- left_join(occurrence.cmec, rii)
+mof.cmec <- left_join(mof.cmec, rii)
 
 # Add eventID column
-occurrence.cmec$eventID <- paste(occurrence.cmec$interval,
-                                 occurrence.cmec$site_code,
-                                 occurrence.cmec$date,
-                                 occurrence.cmec$quad.code,
-                                 sep = '_')
+mof.cmec$eventID <- paste(mof.cmec$interval,
+                          mof.cmec$site_code,
+                          mof.cmec$date,
+                          sep = '_')
+                                 
 
 # CMECS Tidal Zone ------------------------------------------------------------
-cmecs.tidal <- occurrence.cmec
+cmecs.tidal <- mof.cmec
 
 # Add measurement columns
+cmecs.tidal$occurrenceID <- NA_character_
+cmecs.tidal$measurementID <- paste(mof.cmec$eventID, 'cmecs-tidal', sep = '_')
+cmecs.tidal$measurementMethod <- 'https://www.fgdc.gov/standards/projects/cmecs-folder/CMECS_Version_06-2012_FINAL.pdf'
 cmecs.tidal$measurementType <- 'tidal zone as defined by CMECS'
 cmecs.tidal$measurementTypeID <- 'https://w3id.org/CMECS/CMECS_00000034'
 cmecs.tidal$measurementValue <- 'Marine Nearshore Intertidal'
@@ -554,9 +551,12 @@ cmecs.tidal$measurementUnit <- 'not applicable'
 cmecs.tidal$measurementUnitID <- 'https://vocab.nerc.ac.uk/collection/P06/current/XXXX/'
 
 # CMECS Substrate -------------------------------------------------------------
-cmecs.sub <- occurrence.cmec
+cmecs.sub <- mof.cmec
 
 # Add measurement columns
+cmecs.sub$occurrenceID <- NA_character_
+cmecs.sub$measurementID <- paste(mof.cmec$eventID, 'cmecs-substrate', sep = '_')
+cmecs.sub$measurementMethod <- 'https://www.fgdc.gov/standards/projects/cmecs-folder/CMECS_Version_06-2012_FINAL.pdf'
 cmecs.sub$measurementType <- 'substrate component as defined by CMECS'
 cmecs.sub$measurementTypeID <- 'https://w3id.org/CMECS/CMECS_00000803'
 cmecs.sub$measurementValue <- 'Bedrock'
@@ -565,9 +565,12 @@ cmecs.sub$measurementUnit <- 'not applicable'
 cmecs.sub$measurementUnitID <- 'https://vocab.nerc.ac.uk/collection/P06/current/XXXX/'
 
 # CMECS Geoform ---------------------------------------------------------------
-cmecs.geo <- occurrence.cmec
+cmecs.geo <- mof.cmec
 
 # Add measurement columns
+cmecs.geo$occurrenceID <- NA_character_
+cmecs.geo$measurementID <- paste(mof.cmec$eventID, 'cmecs-geoform', sep = '_')
+cmecs.geo$measurementMethod <- 'https://www.fgdc.gov/standards/projects/cmecs-folder/CMECS_Version_06-2012_FINAL.pdf'
 cmecs.geo$measurementType <- 'Geoform Type as defined by CMECS'
 cmecs.geo$measurementTypeID <- 'https://w3id.org/CMECS/CMECS_00000387'
 cmecs.geo$measurementValue <- 'Tide-dominated beach'
@@ -576,35 +579,14 @@ cmecs.geo$measurementUnit <- 'not applicable'
 cmecs.geo$measurementUnitID <- 'https://vocab.nerc.ac.uk/collection/P06/current/XXXX/'
 
 # Bind CMECS back together
-occurrence.cmec <- rbind(cmecs.tidal, cmecs.geo, cmecs.sub)
-
-# Add remaining columns
-occurrence.cmec$occurrenceID <- NA_character_
-occurrence.cmec$scientificName <- NA_character_
-occurrence.cmec$scientificNameID <- NA_character_
-occurrence.cmec$authority <- NA_character_
-occurrence.cmec$taxonRank <- NA_character_
-occurrence.cmec$vernacularName <- NA_character_
-occurrence.cmec$basisOfRecord <- 'HumanObservation'
-occurrence.cmec$occurrenceStatus <- NA_character_
-occurrence.cmec$occurrenceRemarks <- NA_character_
-occurrence.cmec$tag <- 'cmecs vocab'
-occurrence.cmec$size <- NA_real_
+mof.cmec <- rbind(cmecs.tidal, cmecs.geo, cmecs.sub)
 
 # Select required columns and change names
-occurrence.cmec <- occurrence.cmec %>% 
-  select(eventID, occurrenceID, scientificName, scientificNameID, taxonRank,
-         authority, vernacularName, measurementType, measurementTypeID, 
-         measurementValue, measurementValueID, measurementUnit, 
-         measurementUnitID, basisOfRecord, occurrenceStatus, occurrenceRemarks,
-         tag, size)
+mof.cmec <- mof.cmec %>% 
+  select(eventID, occurrenceID, measurementID, measurementMethod,
+         measurementType, measurementTypeID, measurementUnit,
+         measurementUnitID, measurementValue, measurementValueID)
 
-# Join occurrence tables-------------------------------------------------------
-occurrence.tag <- rbind(occurrence.life, occurrence.cmec)
-
-occurrence <- occurrence.tag %>% select(-c(tag, size))
-
-#================== Measurement or Fact Extension =============================
 # Size Measurements------------------------------------------------------------
 mof.s <- occurrence.tag %>% subset(tag == 'measured individuals')
 
@@ -722,3 +704,5 @@ ysi.l <- ysi.l %>%
 
 # Join measurements together
 mof <- rbind(mof.s, ysi.l)
+
+
