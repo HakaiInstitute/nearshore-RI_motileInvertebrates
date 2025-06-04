@@ -7,8 +7,11 @@
 
 ## Data Use
 
-This data is licensed under a Creative Commons Attribution 4.0 International 
-License (CC-BY).
+This data is licensed under a Creative Commons Attribution 4.0 International
+License (CC-BY). This license allows you to Share and Adapt the material 
+contained in this dataset assuming proper Attribution is given. To view a copy
+of this license, visit http://creativecommons.org/licenses/by/4.0/ or send a 
+letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
 
 In light of the effort required to create data packages, we request that in
 addition to following the CC-BY license terms, that users 1) respect the data 
@@ -36,6 +39,8 @@ communities. Please see the list of all Rocky Intertidal program data packages
 here: 
 https://docs.google.com/document/d/11uqZNnwSabw0thcbntlTkZpVgVAkjPDJS17_ur6W7S8/edit 
 
+See the changelog for the specific changes to this dataset included in each release.
+
 ## Survey Methods
 
 This data package collects data and information relating to mobile 
@@ -47,7 +52,7 @@ Intertidal protocol contained in this dataset.
 
 ## Resources
 
-See the data dictionary file for a complete description of data variables, 
+See the data dictionary file (data-dictionary.csv) for a complete description of data variables, 
 units and descriptions.
 
 - ***Data*** 
