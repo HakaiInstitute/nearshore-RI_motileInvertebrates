@@ -6,7 +6,15 @@ and this project adheres to [Semantic Versioning]
 (https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
-- Survey data from February 2025
+- Survey data from February, June, & August 2025
+
+## [3.2.0] 2025-08-14
+### Changed
+- Updated README with citation change and minor review fixes
+- Updated survey data with minor review fixes
+
+### Added
+- Text file of Creative Commons License
 
 ## [3.2.0] 2025-03-27
 ### Changed
