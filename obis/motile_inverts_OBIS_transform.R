@@ -285,15 +285,6 @@ names(mi.e.subquad) <- c('datasetName', 'eventID', 'parentEventID',
 
 # Join events together into single dataset-------------------------------------
 event <- rbind(event, mi.e.subquad)
-
-# Flatten events
-event <- flatten_event(event = event, 
-                       fields = c('verbatimLocality', 'year', 'day', 'month',
-                                  'decimalLatitude', 'decimalLongitude',
-                                  'coordinateUncertaintyInMeters',
-                                  'minimumDistanceAboveSurfaceInMeters',
-                                  'maximumDistanceAboveSurfaceInMeters',
-                                  'habitat'))
                         
 # Add sampling protocol column
 event$samplingProtocol <- 'https://github.com/HakaiInstitute/nearshore-RI_motileInvertebrates/blob/eaebf4b2b252b48ba79eae92e32e5f8b6d6f2ac1/protocols/rocky_intertidal-protocol.pdf'
@@ -322,6 +313,9 @@ event$geodeticDatum <- 'WGS84'
 
 # Add modified column
 event$modified <- lubridate::today()
+
+# Save event file
+write_csv(event, file = '/obis/obis_outputs/event.csv')
 
 #================== Occurrence Extension ======================================
 # Copy survey data
@@ -488,8 +482,8 @@ authority <- read_csv('./obis/authority.csv')
 # Join life observations and add missing columns
 occurrence <- rbind(occurrence.nm, occurrence.m, occurrence.l)
 
-occurrence$occurrenceID <- paste(occurrence.life$eventID,
-                                 rownames(occurrence.life),
+occurrence$occurrenceID <- paste(occurrence$eventID,
+                                 rownames(occurrence),
                                  sep = '_')
                                        
 occurrence <- left_join(occurrence, authority,
@@ -508,6 +502,9 @@ names(occurrence)[names(occurrence) == 'scientific_name_full'] <- 'scientificNam
 occurrence.tag <- occurrence
 
 occurrence <- occurrence %>% select(-c(tag, size))
+
+# Save occurrence file
+write_csv(occurrence, file = '/obis/obis_outputs/occurrence.csv')
 
 #================== Measurement or Fact Extension =============================
 # CMECS descriptors------------------------------------------------------------
@@ -587,6 +584,9 @@ mof.cmec <- mof.cmec %>%
          measurementType, measurementTypeID, measurementUnit,
          measurementUnitID, measurementValue, measurementValueID)
 
+# remove duplicated rows
+mof.cmec <- mof.cmec %>% distinct()
+
 # Size Measurements------------------------------------------------------------
 mof.s <- occurrence.tag %>% subset(tag == 'measured individuals')
 
@@ -599,7 +599,7 @@ mof.s <- mof.s %>%
 
 # Add missing columns
 mof.s$measurementType <- 'Length'
-mof.s$measurementMethod <- 'In the field'
+mof.s$measurementMethod <- 'Calipers to nearest mm'
 mof.s$measurementTypeID <- NA_character_
 mof.s$measurementUnit <- 'mm'
 mof.s$measurementUnitID <- NA_character_
@@ -690,10 +690,13 @@ for (i in 1:length(ysi.l$eventID)){
 # Add missing columns
 ysi.l$occurrenceID <- NA_character_
 ysi.l$measurementID <- paste(ysi.l$eventID, ysi.l$measurementType, sep = '_')
-ysi.l$measurementMethod <- NA_character_
+ysi.l$measurementMethod <- 'YSI'
 ysi.l$measurementTypeID <- NA_character_
-ysi.l$measurementUnit <- NA_character_
-ysi.l$measurementUnitID <- NA_character_
+ysi.l$measurementUnit <- ifelse(ysi.l$measurementType == 'sea_surface_temperature',
+                                'degree celsius', 'practical salinity scale')
+ysi.l$measurementUnitID <- ifelse(ysi.l$measurementType == 'sea_surface_temperature',
+                                  'https://vocab.nerc.ac.uk/collection/P06/current/UPAA/',
+                                  'https://vocab.nerc.ac.uk/collection/A05/current/EV_SALIN/')
 ysi.l$measurementValueID <- NA_character_
 
 # Rearrange columns
@@ -703,6 +706,7 @@ ysi.l <- ysi.l %>%
          measurementUnitID, measurementValue, measurementValueID)
 
 # Join measurements together
-mof <- rbind(mof.s, ysi.l)
+mof <- rbind(mof.cmec, mof.s, ysi.l)
 
-
+# Save measurement file
+write_csv(mof, file = '/obis/obis_outputs/eMoF.csv')
