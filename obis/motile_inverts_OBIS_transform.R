@@ -21,7 +21,7 @@ mi <- read_csv('./data/motile_invertebrates-surveys.csv')
 
 # Download RI intervals google sheet and subset by max survey date
 rii <- read_sheet(ss = '1Jlbt_-rvoGA6V6EQtIdmaxYnlaru0fZMS52EcN5pIGE',
-                  sheet = 'Sheet1',
+                  sheet = 'intervals',
                   col_types = 'cDc') %>% 
   subset(date <= max(mi$date))
 
@@ -315,7 +315,7 @@ event$geodeticDatum <- 'WGS84'
 event$modified <- lubridate::today()
 
 # Save event file
-write_csv(event, file = '/obis/obis_outputs/event.csv')
+write_csv(event, file = './obis/obis_outputs/event.csv')
 
 #================== Occurrence Extension ======================================
 # Copy survey data
@@ -504,7 +504,7 @@ occurrence.tag <- occurrence
 occurrence <- occurrence %>% select(-c(tag, size))
 
 # Save occurrence file
-write_csv(occurrence, file = '/obis/obis_outputs/occurrence.csv')
+write_csv(occurrence, file = './obis/obis_outputs/occurrence.csv')
 
 #================== Measurement or Fact Extension =============================
 # CMECS descriptors------------------------------------------------------------
@@ -709,4 +709,4 @@ ysi.l <- ysi.l %>%
 mof <- rbind(mof.cmec, mof.s, ysi.l)
 
 # Save measurement file
-write_csv(mof, file = '/obis/obis_outputs/eMoF.csv')
+write_csv(mof, file = './obis/obis_outputs/eMoF.csv')

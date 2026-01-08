@@ -1507,10 +1507,10 @@ RICE024_FB_2020-11-16_MQ5,RICE024_FB_2020-11-16_MQ5_1505,"Hemigrapsus nudus (Dan
 RICE024_FB_2020-11-16_BQ4,RICE024_FB_2020-11-16_BQ4_1506,"Gastropoda Cuvier, 1795",urn:lsid:marinespecies.org:taxname:101,CLASS,NA,alive,1,HumanObservation,present,NA
 RICE024_FB_2020-11-16_BQ5,RICE024_FB_2020-11-16_BQ5_1507,"Gastropoda Cuvier, 1795",urn:lsid:marinespecies.org:taxname:101,CLASS,NA,alive,1,HumanObservation,present,NA
 RICE024_FB_2020-11-16_FQ5,RICE024_FB_2020-11-16_FQ5_1508,"Gastropoda Cuvier, 1795",urn:lsid:marinespecies.org:taxname:101,CLASS,NA,alive,1,HumanObservation,present,NA
-NA_FB_2020-11-17_FQ1,NA_FB_2020-11-17_FQ1_1509,"Gastropoda Cuvier, 1795",urn:lsid:marinespecies.org:taxname:101,CLASS,NA,alive,1,HumanObservation,present,NA
-NA_FB_2020-11-17_FQ2,NA_FB_2020-11-17_FQ2_1510,"Gastropoda Cuvier, 1795",urn:lsid:marinespecies.org:taxname:101,CLASS,NA,alive,10,HumanObservation,present,NA
-NA_FB_2020-11-17_FQ3,NA_FB_2020-11-17_FQ3_1511,"Gastropoda Cuvier, 1795",urn:lsid:marinespecies.org:taxname:101,CLASS,NA,alive,2,HumanObservation,present,NA
-NA_FB_2020-11-17_FQ4,NA_FB_2020-11-17_FQ4_1512,"Gastropoda Cuvier, 1795",urn:lsid:marinespecies.org:taxname:101,CLASS,NA,alive,2,HumanObservation,present,NA
+RICE024_WB_2020-11-17_FQ1,RICE024_WB_2020-11-17_FQ1_1509,"Gastropoda Cuvier, 1795",urn:lsid:marinespecies.org:taxname:101,CLASS,NA,alive,1,HumanObservation,present,NA
+RICE024_WB_2020-11-17_FQ2,RICE024_WB_2020-11-17_FQ2_1510,"Gastropoda Cuvier, 1795",urn:lsid:marinespecies.org:taxname:101,CLASS,NA,alive,10,HumanObservation,present,NA
+RICE024_WB_2020-11-17_FQ3,RICE024_WB_2020-11-17_FQ3_1511,"Gastropoda Cuvier, 1795",urn:lsid:marinespecies.org:taxname:101,CLASS,NA,alive,2,HumanObservation,present,NA
+RICE024_WB_2020-11-17_FQ4,RICE024_WB_2020-11-17_FQ4_1512,"Gastropoda Cuvier, 1795",urn:lsid:marinespecies.org:taxname:101,CLASS,NA,alive,2,HumanObservation,present,NA
 RICE025_WB_2021-02-07_FQ3,RICE025_WB_2021-02-07_FQ3_1513,"Gastropoda Cuvier, 1795",urn:lsid:marinespecies.org:taxname:101,CLASS,NA,alive,1,HumanObservation,present,NA
 RICE025_WB_2021-02-07_FQ3,RICE025_WB_2021-02-07_FQ3_1514,"Nucella ostrina (A. Gould, 1852)",urn:lsid:marinespecies.org:taxname:404225,SPECIES,Northern striped dog whelk,alive,1,HumanObservation,present,NA
 RICE025_WB_2021-02-07_FQ4,RICE025_WB_2021-02-07_FQ4_1515,"Gastropoda Cuvier, 1795",urn:lsid:marinespecies.org:taxname:101,CLASS,NA,alive,2,HumanObservation,present,NA
@@ -10138,21 +10138,21 @@ RICE024_FB_2020-11-16_BQ4_3,RICE024_FB_2020-11-16_BQ4_3_10136,"Littorina A. Fér
 RICE024_FB_2020-11-16_BQ5_1,RICE024_FB_2020-11-16_BQ5_1_10137,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,12,HumanObservation,present,NA
 RICE024_FB_2020-11-16_BQ5_2,RICE024_FB_2020-11-16_BQ5_2_10138,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,19,HumanObservation,present,NA
 RICE024_FB_2020-11-16_BQ5_3,RICE024_FB_2020-11-16_BQ5_3_10139,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,3,HumanObservation,present,NA
-NA_FB_2020-11-17_FQ5_1,NA_FB_2020-11-17_FQ5_1_10140,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,19,HumanObservation,present,NA
-NA_FB_2020-11-17_FQ5_2,NA_FB_2020-11-17_FQ5_2_10141,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,2,HumanObservation,present,NA
-NA_FB_2020-11-17_FQ5_3,NA_FB_2020-11-17_FQ5_3_10142,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,0,HumanObservation,present,NA
-NA_FB_2020-11-17_FQ1_1,NA_FB_2020-11-17_FQ1_1_10143,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,16,HumanObservation,present,NA
-NA_FB_2020-11-17_FQ1_2,NA_FB_2020-11-17_FQ1_2_10144,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,13,HumanObservation,present,NA
-NA_FB_2020-11-17_FQ1_3,NA_FB_2020-11-17_FQ1_3_10145,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,11,HumanObservation,present,NA
-NA_FB_2020-11-17_FQ2_1,NA_FB_2020-11-17_FQ2_1_10146,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,7,HumanObservation,present,NA
-NA_FB_2020-11-17_FQ2_2,NA_FB_2020-11-17_FQ2_2_10147,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,1,HumanObservation,present,NA
-NA_FB_2020-11-17_FQ2_3,NA_FB_2020-11-17_FQ2_3_10148,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,4,HumanObservation,present,NA
-NA_FB_2020-11-17_FQ3_1,NA_FB_2020-11-17_FQ3_1_10149,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,16,HumanObservation,present,NA
-NA_FB_2020-11-17_FQ3_2,NA_FB_2020-11-17_FQ3_2_10150,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,34,HumanObservation,present,NA
-NA_FB_2020-11-17_FQ3_3,NA_FB_2020-11-17_FQ3_3_10151,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,1,HumanObservation,present,NA
-NA_FB_2020-11-17_FQ4_1,NA_FB_2020-11-17_FQ4_1_10152,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,5,HumanObservation,present,NA
-NA_FB_2020-11-17_FQ4_2,NA_FB_2020-11-17_FQ4_2_10153,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,1,HumanObservation,present,NA
-NA_FB_2020-11-17_FQ4_3,NA_FB_2020-11-17_FQ4_3_10154,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,1,HumanObservation,present,NA
+RICE024_WB_2020-11-17_FQ5_1,RICE024_WB_2020-11-17_FQ5_1_10140,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,19,HumanObservation,present,NA
+RICE024_WB_2020-11-17_FQ5_2,RICE024_WB_2020-11-17_FQ5_2_10141,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,2,HumanObservation,present,NA
+RICE024_WB_2020-11-17_FQ5_3,RICE024_WB_2020-11-17_FQ5_3_10142,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,0,HumanObservation,present,NA
+RICE024_WB_2020-11-17_FQ1_1,RICE024_WB_2020-11-17_FQ1_1_10143,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,16,HumanObservation,present,NA
+RICE024_WB_2020-11-17_FQ1_2,RICE024_WB_2020-11-17_FQ1_2_10144,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,13,HumanObservation,present,NA
+RICE024_WB_2020-11-17_FQ1_3,RICE024_WB_2020-11-17_FQ1_3_10145,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,11,HumanObservation,present,NA
+RICE024_WB_2020-11-17_FQ2_1,RICE024_WB_2020-11-17_FQ2_1_10146,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,7,HumanObservation,present,NA
+RICE024_WB_2020-11-17_FQ2_2,RICE024_WB_2020-11-17_FQ2_2_10147,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,1,HumanObservation,present,NA
+RICE024_WB_2020-11-17_FQ2_3,RICE024_WB_2020-11-17_FQ2_3_10148,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,4,HumanObservation,present,NA
+RICE024_WB_2020-11-17_FQ3_1,RICE024_WB_2020-11-17_FQ3_1_10149,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,16,HumanObservation,present,NA
+RICE024_WB_2020-11-17_FQ3_2,RICE024_WB_2020-11-17_FQ3_2_10150,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,34,HumanObservation,present,NA
+RICE024_WB_2020-11-17_FQ3_3,RICE024_WB_2020-11-17_FQ3_3_10151,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,1,HumanObservation,present,NA
+RICE024_WB_2020-11-17_FQ4_1,RICE024_WB_2020-11-17_FQ4_1_10152,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,5,HumanObservation,present,NA
+RICE024_WB_2020-11-17_FQ4_2,RICE024_WB_2020-11-17_FQ4_2_10153,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,1,HumanObservation,present,NA
+RICE024_WB_2020-11-17_FQ4_3,RICE024_WB_2020-11-17_FQ4_3_10154,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,1,HumanObservation,present,NA
 RICE025_WB_2021-02-07_FQ1_1,RICE025_WB_2021-02-07_FQ1_1_10155,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,12,HumanObservation,present,NA
 RICE025_WB_2021-02-07_FQ1_2,RICE025_WB_2021-02-07_FQ1_2_10156,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,8,HumanObservation,present,NA
 RICE025_WB_2021-02-07_FQ1_3,RICE025_WB_2021-02-07_FQ1_3_10157,"Littorina A. Férussac, 1822",urn:lsid:marinespecies.org:taxname:138135,GENUS,periwinkle,alive,25,HumanObservation,present,NA
