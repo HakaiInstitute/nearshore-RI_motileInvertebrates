@@ -503,6 +503,9 @@ occurrence.tag <- occurrence
 
 occurrence <- occurrence %>% select(-c(tag, size))
 
+# make taxonRank column lower case
+occurrence$taxonRank <- tolower(occurrence$taxonRank)
+
 # Save occurrence file
 write_csv(occurrence, file = './obis/obis_outputs/occurrence.csv')
 
