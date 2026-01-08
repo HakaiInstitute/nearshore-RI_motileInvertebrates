@@ -122,7 +122,7 @@ names(mi.e.sv) <- c('datasetName', 'eventID', 'parentEventID',
                     'coordinateUncertaintyInMeters',
                     'minimumDistanceAboveSurfaceInMeters',
                     'maximumDistanceAboveSurfaceInMeters', 'habitat',
-                    'sampleSizeUnit', 'sampleSizeValue', 'eventType', 
+                    'sampleSizeValue', 'sampleSizeUnit', 'eventType', 
                     'eventRemarks')
 
 # Add to event table
@@ -192,7 +192,7 @@ names(mi.e.quad) <- c('datasetName', 'eventID', 'parentEventID',
                       'coordinateUncertaintyInMeters', 
                       'minimumDistanceAboveSurfaceInMeters',
                       'maximumDistanceAboveSurfaceInMeters', 'habitat',
-                      'sampleSizeUnit', 'sampleSizeValue', 'eventType', 
+                      'sampleSizeValue', 'sampleSizeUnit', 'eventType', 
                       'eventRemarks')
 
 # Add to event table and flatten events
@@ -279,7 +279,7 @@ names(mi.e.subquad) <- c('datasetName', 'eventID', 'parentEventID',
                          'coordinateUncertaintyInMeters', 
                          'minimumDistanceAboveSurfaceInMeters',
                          'maximumDistanceAboveSurfaceInMeters', 'habitat',
-                         'sampleSizeUnit', 'sampleSizeValue', 'eventType', 
+                         'sampleSizeValue', 'sampleSizeUnit', 'eventType', 
                          'eventRemarks')
                       
 
