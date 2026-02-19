@@ -166,7 +166,7 @@ mi.e.quad$month <- NA_real_
 mi.e.quad$day <- NA_real_
 mi.e.quad$verbatimLocality <- NA_character_
 mi.e.quad$sampleSizeValue <- 0.38
-mi.e.quad$sampleSizeUnit <- 'square meter'
+mi.e.quad$sampleSizeUnit <- 'square_metre'
 mi.e.quad$eventType <- 'quadrat'
 mi.e.quad$eventRemarks <- 'Only Lottia spp. with length > 15mm were counted'
 mi.e.quad$minimumDistanceAboveSurfaceInMeters <- mi.e.quad$quadrat_elevation
@@ -254,7 +254,7 @@ mi.e.subquad$verbatimLocality <- NA_character_
 mi.e.subquad$year <- NA_real_
 mi.e.subquad$month <- NA_real_
 mi.e.subquad$day <- NA_real_
-mi.e.subquad$sampleSizeUnit <- 'square meter'
+mi.e.subquad$sampleSizeUnit <- 'square_metre'
 mi.e.subquad$eventType <- 'sub-quadrat'
 mi.e.subquad$eventRemarks <- NA_character_
 mi.e.subquad$decimalLatitude <- NA_real_
@@ -285,7 +285,17 @@ names(mi.e.subquad) <- c('datasetName', 'eventID', 'parentEventID',
 
 # Join events together into single dataset-------------------------------------
 event <- rbind(event, mi.e.subquad)
-                        
+ 
+# Flatten date and site columns
+event <- flatten_event(event = event, 
+                       fields = c('verbatimLocality', 'eventDate', 'year', 
+                                  'month', 'day', 'decimalLatitude', 
+                                  'decimalLongitude',
+                                  'coordinateUncertaintyInMeters',
+                                  'minimumDistanceAboveSurfaceInMeters',
+                                  'maximumDistanceAboveSurfaceInMeters',
+                                  'habitat'))
+
 # Add sampling protocol column
 event$samplingProtocol <- 'https://github.com/HakaiInstitute/nearshore-RI_motileInvertebrates/blob/eaebf4b2b252b48ba79eae92e32e5f8b6d6f2ac1/protocols/rocky_intertidal-protocol.pdf'
 
@@ -308,7 +318,7 @@ event$institutionCode <- 'https://edmo.seadatanet.org/report/5148'
 event$country <- 'Canada'
 event$countryCode <- 'CA'
 
-#Add geodetic column
+# Add geodetic column
 event$geodeticDatum <- 'WGS84'
 
 # Add modified column
@@ -365,14 +375,16 @@ occurrence.m$tag <- 'measured individuals'
 
 # Select required columns and change names
 occurrence.m <- occurrence.m %>% 
-  select(eventID, scientific_name, rank, LSID, common_name, vitality, count, 
-         basisOfRecord, occurrenceStatus, notes, tag, size)
+  select(eventID, scientific_name, rank, LSID, common_name, kingdom, phylum, 
+         class, order, family, genus, species, vitality, count, basisOfRecord, 
+         occurrenceStatus, notes, tag, size)
 
 names(occurrence.m) <- c('eventID', 'scientificName', 'taxonRank', 
-                         'scientificNameID', 'vernacularName', 'vitality',
-                         'individualCount', 'basisOfRecord', 
-                         'occurrenceStatus', 'occurrenceRemarks', 'tag', 
-                         'size')
+                         'scientificNameID', 'vernacularName', 'kingdom', 
+                         'phylum', 'class', 'order', 'family', 'genus', 
+                         'species', 'vitality', 'individualCount', 
+                         'basisOfRecord', 'occurrenceStatus', 
+                         'occurrenceRemarks', 'tag', 'size')
 
 # Unmeasured occurrences-------------------------------------------------------
 occurrence.nm <- occurrence %>%         # split off whole plot observations
@@ -414,14 +426,16 @@ occurrence.nm$size <- NA_real_
 
 # Select required columns and change names
 occurrence.nm <- occurrence.nm %>% 
-  select(eventID, scientific_name, rank, LSID, common_name, vitality, count, 
-         basisOfRecord, occurrenceStatus, notes, tag, size)
+  select(eventID, scientific_name, rank, LSID, common_name, kingdom, phylum, 
+         class, order, family, genus, species, vitality, count, basisOfRecord, 
+         occurrenceStatus, notes, tag, size)
 
 names(occurrence.nm) <- c('eventID', 'scientificName', 'taxonRank', 
-                          'scientificNameID', 'vernacularName', 'vitality',
-                          'individualCount', 'basisOfRecord', 
-                          'occurrenceStatus', 'occurrenceRemarks', 'tag', 
-                          'size')
+                          'scientificNameID', 'vernacularName', 'kingdom', 
+                          'phylum', 'class', 'order', 'family', 'genus', 
+                          'species', 'vitality', 'individualCount', 
+                          'basisOfRecord', 'occurrenceStatus', 
+                          'occurrenceRemarks', 'tag', 'size')
                          
 # Littorine occurrences--------------------------------------------------------
 occurrence.l <- occurrence %>%         # split off littorine observations
@@ -467,14 +481,16 @@ occurrence.l$size <- NA_real_
 
 # Select required columns and change names
 occurrence.l <- occurrence.l %>% 
-  select(eventID, scientific_name, rank, LSID, common_name, vitality, count, 
-         basisOfRecord, occurrenceStatus, notes, tag, size)
+  select(eventID, scientific_name, rank, LSID, common_name, kingdom, phylum, 
+         class, order, family, genus, species, vitality, count, basisOfRecord, 
+         occurrenceStatus, notes, tag, size)
 
-names(occurrence.l) <- c('eventID', 'scientificName', 'taxonRank',
-                         'scientificNameID', 'vernacularName', 'vitality',
-                         'individualCount', 'basisOfRecord', 
-                         'occurrenceStatus', 'occurrenceRemarks', 'tag', 
-                         'size')
+names(occurrence.l) <- c('eventID', 'scientificName', 'taxonRank', 
+                         'scientificNameID', 'vernacularName', 'kingdom', 
+                         'phylum', 'class', 'order', 'family', 'genus', 
+                         'species', 'vitality', 'individualCount', 
+                         'basisOfRecord', 'occurrenceStatus', 
+                         'occurrenceRemarks', 'tag', 'size')
                           
 # Join biological occurrences--------------------------------------------------
 authority <- read_csv('./obis/authority.csv')
@@ -482,9 +498,9 @@ authority <- read_csv('./obis/authority.csv')
 # Join life observations and add missing columns
 occurrence <- rbind(occurrence.nm, occurrence.m, occurrence.l)
 
-occurrence$occurrenceID <- paste(occurrence$eventID,
+occurrence$occurrenceID <- paste(occurrence$eventID, '_O',
                                  rownames(occurrence),
-                                 sep = '_')
+                                 sep = '')
                                        
 occurrence <- left_join(occurrence, authority,
                         by = c('scientificName' = 'scientific_name'))
@@ -492,7 +508,8 @@ occurrence <- left_join(occurrence, authority,
 # Select columns
 occurrence <- occurrence %>% 
   select(eventID, occurrenceID, scientific_name_full, scientificNameID, 
-         taxonRank, vernacularName, vitality, individualCount, basisOfRecord, 
+         taxonRank, vernacularName, kingdom, phylum, class, order, family,
+         genus, species, vitality, individualCount, basisOfRecord, 
          occurrenceStatus, occurrenceRemarks, tag, size)
  
 # Change authority column name
@@ -603,9 +620,9 @@ mof.s <- mof.s %>%
 # Add missing columns
 mof.s$measurementType <- 'Length'
 mof.s$measurementMethod <- 'Calipers to nearest mm'
-mof.s$measurementTypeID <- NA_character_
+mof.s$measurementTypeID <- 'http://vocab.nerc.ac.uk/collection/P01/current/OBSINDLX/'
 mof.s$measurementUnit <- 'mm'
-mof.s$measurementUnitID <- NA_character_
+mof.s$measurementUnitID <- 'http://vocab.nerc.ac.uk/collection/P06/current/UXMM/'
 mof.s$measurementValueID <- NA_character_
 
 # Rearrange columns
