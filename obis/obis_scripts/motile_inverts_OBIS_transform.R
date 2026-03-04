@@ -32,7 +32,7 @@ rii$year <- year(rii$date)
 mi <- left_join(mi, rii)
 
 # Source taxonomic data
-source('./obis/source_taxonomy.R')
+source('./obis/obis_scripts/source_taxonomy.R')
 
 #================== Event Core ================================================
 # Event table for expeditions--------------------------------------------------
@@ -145,10 +145,12 @@ names(mi.e.quad) <- c('eventDate', 'site_name', 'plot_type', 'plot',
                       'type.code', 'quad.code')
 
 # Join with site visit data
-mi.e.quad <- left_join(mi.e.quad, mi.e.sv)
+mi.e.quad <- left_join(mi.e.quad, mi.e.sv,
+                       by = c('site_name' = 'verbatimLocality',
+                              'eventDate'))
 
 # Add lat/long columns
-mi.e.quad.coord <- read_csv('obis/quadrat_locations.csv')
+mi.e.quad.coord <- read_csv('obis/obis_data/quadrat_locations.csv')
 mi.e.quad <- left_join(mi.e.quad, mi.e.quad.coord)
 mi.e.quad$coordinateUncertaintyInMeters <- 0.1
 
@@ -306,7 +308,7 @@ event$language <- 'en'
 event$license <- 'https://github.com/HakaiInstitute/nearshore-RI_motileInvertebrates/blob/main/LICENSE'
 
 # Add citation column
-event$bibliographicCitation <- 'Froese, T., Sadlier-Brown, G., Hessing-Lewis, M., & Gehman, A.-L. (2024). Motile Invertebrate Surveys - BC Central Coast (3.2.0) [Data set]. Hakai Institute. https://doi.org/10.21966/0052-wk15'
+event$bibliographicCitation <- 'Froese, T., Sadlier-Brown, G., Hessing-Lewis, M., & Gehman, A.-L. (2025). Motile Invertebrate Surveys - BC Central Coast (3.3.0) [Data set]. Hakai Institute. https://doi.org/10.21966/0052-wk15'
 
 # Add rights holder column
 event$rightsHolder <- 'Hakai Institute'
@@ -330,6 +332,11 @@ write_csv(event, file = './obis/obis_outputs/event.csv')
 #================== Occurrence Extension ======================================
 # Copy survey data
 occurrence <- mi
+
+# Remove unwanted records
+occurrence <- occurrence %>%
+  dplyr::filter(is.na(notes) | !notes %in% c("dead", "DEAD", 
+                                             "juvenile Pagurus"))
 
 # Join with taxonomic data
 occurrence <- left_join(occurrence, ns.taxa)
@@ -493,7 +500,7 @@ names(occurrence.l) <- c('eventID', 'scientificName', 'taxonRank',
                          'occurrenceRemarks', 'tag', 'size')
                           
 # Join biological occurrences--------------------------------------------------
-authority <- read_csv('./obis/authority.csv')
+authority <- read_csv('./obis/obis_data/authority.csv')
 
 # Join life observations and add missing columns
 occurrence <- rbind(occurrence.nm, occurrence.m, occurrence.l)
@@ -611,16 +618,19 @@ mof.cmec <- mof.cmec %>% distinct()
 mof.s <- occurrence.tag %>% subset(tag == 'measured individuals')
 
 # Add measurement id to size measurement table
-mof.s$measurementID <- paste(mof.s$occurrenceID, "length", sep = '_')
+mof.s$measurementID <- paste(mof.s$occurrenceID, "measurement", sep = '_')
 
 # Select relevant columns
 mof.s <- mof.s %>% 
-  select(eventID, occurrenceID, measurementID, size)
+  select(eventID, occurrenceID, measurementID, size, scientificName)
 
-# Add missing columns
-mof.s$measurementType <- 'Length'
+# Add measurement ids
+mof.s.measure <- read_csv('./obis/obis_data/measurementTypes.csv')
+
+mof.s <- left_join(mof.s, mof.s.measure, by = 'scientificName')
+
+# Add other missing columns
 mof.s$measurementMethod <- 'Calipers to nearest mm'
-mof.s$measurementTypeID <- 'http://vocab.nerc.ac.uk/collection/P01/current/OBSINDLX/'
 mof.s$measurementUnit <- 'mm'
 mof.s$measurementUnitID <- 'http://vocab.nerc.ac.uk/collection/P06/current/UXMM/'
 mof.s$measurementValueID <- NA_character_
@@ -711,7 +721,9 @@ for (i in 1:length(ysi.l$eventID)){
 ysi.l$occurrenceID <- NA_character_
 ysi.l$measurementID <- paste(ysi.l$eventID, ysi.l$measurementType, sep = '_')
 ysi.l$measurementMethod <- 'YSI'
-ysi.l$measurementTypeID <- NA_character_
+ysi.l$measurementTypeID <- ifelse(ysi.l$measurementType == 'sea_surface_temperature',
+                                  'https://vocab.nerc.ac.uk/collection/P01/current/TEMPPP01/', 
+                                  '')
 ysi.l$measurementUnit <- ifelse(ysi.l$measurementType == 'sea_surface_temperature',
                                 'degree celsius', 'practical salinity scale')
 ysi.l$measurementUnitID <- ifelse(ysi.l$measurementType == 'sea_surface_temperature',

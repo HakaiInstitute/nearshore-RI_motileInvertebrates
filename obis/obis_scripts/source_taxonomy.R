@@ -9,11 +9,11 @@
 #
 #================== Taxon Data ================================================
 # Classifications--------------------------------------------------------------
-ns.taxa <- read_csv('obis/nearshore_taxa.csv',
+ns.taxa <- read_csv('obis/obis_data/nearshore_taxa.csv',
                     col_types = 'ccccncccccccccccccccccccccccccccccccccc')
 
 # Nearshore Codes--------------------------------------------------------------
-ri.codes <- read_csv('obis/ri_codes.csv')
+ri.codes <- read_csv('obis/obis_data/ri_codes.csv')
 
 # join taxa data to codes
 ri.codes <- left_join(ri.codes, ns.taxa)

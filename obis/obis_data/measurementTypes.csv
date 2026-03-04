@@ -1,0 +1,16 @@
+scientificName,measurementType,measurementTypeID
+"Nucella ostrina (A. Gould, 1852)",length,https://vocab.nerc.ac.uk/collection/P01/current/OBSINDLX/
+"Nucella lamellosa (Gmelin, 1791)",length,https://vocab.nerc.ac.uk/collection/P01/current/OBSINDLX/
+"Nucella canaliculata (Duclos, 1832)",length,https://vocab.nerc.ac.uk/collection/P01/current/OBSINDLX/
+"Nucella emarginata (Deshayes, 1839)",length,https://vocab.nerc.ac.uk/collection/P01/current/OBSINDLX/
+"Nucella Röding, 1798",length,https://vocab.nerc.ac.uk/collection/P01/current/OBSINDLX/
+"Amphissa H. Adams & A. Adams, 1853",length,https://vocab.nerc.ac.uk/collection/P01/current/OBSINDLX/
+"Homalopoma P. P. Carpenter, 1864",shell width,https://vocab.nerc.ac.uk/collection/P01/current/SHEWID01/
+"Trochidae Rafinesque, 1815",shell width,https://vocab.nerc.ac.uk/collection/P01/current/SHEWID01/
+"Calliostoma Swainson, 1840         ",shell width,https://vocab.nerc.ac.uk/collection/P01/current/SHEWID01/
+"Calliostoma ligatum (A. Gould, 1849)",shell width,https://vocab.nerc.ac.uk/collection/P01/current/SHEWID01/
+"Tegula funebralis (A. Adams, 1855)",shell width,https://vocab.nerc.ac.uk/collection/P01/current/SHEWID01/
+"Katharina tunicata (W. Wood, 1815)",total_length,https://vocab.nerc.ac.uk/collection/P01/current/TL01XX01/
+"Nudibranchia Cuvier, 1817",total_length,https://vocab.nerc.ac.uk/collection/P01/current/TL01XX01/
+"Amphipoda Latreille, 1816",total_length,https://vocab.nerc.ac.uk/collection/P01/current/TL01XX01/
+"Pisaster ochraceus (Brandt, 1835)",radius,https://vocab.nerc.ac.uk/collection/P01/current/OBSINRAD/
