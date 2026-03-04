@@ -327,7 +327,7 @@ event$geodeticDatum <- 'WGS84'
 event$modified <- lubridate::today()
 
 # Save event file
-write_csv(event, file = './obis/obis_outputs/event.csv')
+write_csv(event, file = './obis/obis_outputs/event.csv', na = '')
 
 #================== Occurrence Extension ======================================
 # Copy survey data
@@ -531,7 +531,7 @@ occurrence <- occurrence %>% select(-c(tag, size))
 occurrence$taxonRank <- tolower(occurrence$taxonRank)
 
 # Save occurrence file
-write_csv(occurrence, file = './obis/obis_outputs/occurrence.csv')
+write_csv(occurrence, file = './obis/obis_outputs/occurrence.csv', na = '')
 
 #================== Measurement or Fact Extension =============================
 # CMECS descriptors------------------------------------------------------------
@@ -741,4 +741,4 @@ ysi.l <- ysi.l %>%
 mof <- rbind(mof.cmec, mof.s, ysi.l)
 
 # Save measurement file
-write_csv(mof, file = './obis/obis_outputs/eMoF.csv')
+write_csv(mof, file = './obis/obis_outputs/eMoF.csv', na = '')
