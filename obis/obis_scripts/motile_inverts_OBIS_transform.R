@@ -308,7 +308,7 @@ event$language <- 'en'
 event$license <- 'https://github.com/HakaiInstitute/nearshore-RI_motileInvertebrates/blob/main/LICENSE'
 
 # Add citation column
-event$bibliographicCitation <- 'Froese, T., Sadlier-Brown, G., Hessing-Lewis, M., & Gehman, A.-L. (2025). Motile Invertebrate Surveys - BC Central Coast (3.3.0) [Data set]. Hakai Institute. https://doi.org/10.21966/0052-wk15'
+event$bibliographicCitation <- 'Froese, T., Sadlier-Brown, G., Hessing-Lewis, M., & Gehman, A.-L. (2026). Motile Invertebrate Surveys - BC Central Coast (3.3.0) [Data set]. Hakai Institute. https://doi.org/10.21966/0052-wk15'
 
 # Add rights holder column
 event$rightsHolder <- 'Hakai Institute'
@@ -446,7 +446,7 @@ names(occurrence.nm) <- c('eventID', 'scientificName', 'taxonRank',
                          
 # Littorine occurrences--------------------------------------------------------
 occurrence.l <- occurrence %>%         # split off littorine observations
-  subset(count_type == 'Littorines')
+  subset(count_type == 'Littorines' & count > 0)
 
 # Join with interval data
 occurrence.l <- left_join(occurrence.l, rii)
